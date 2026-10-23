@@ -1,7 +1,6 @@
 import { HttpError, json, readJson } from '../../_lib/http.js';
 import { getSql } from '../../_lib/db.js';
-import { requireAdmin, requireUser } from '../../_lib/auth.js';
-import { clubTimezone } from '../../_lib/config.js';
+import { requireAdmin, requireClub, requireMembership } from '../../_lib/clubs.js';
 import {
   asEnum,
   asId,
@@ -9,10 +8,10 @@ import {
 } from '../../_lib/validate.js';
 
 export async function onRequestGet(context) {
-  const user = requireUser(context);
+  const membership = requireMembership(context);
+  const club = requireClub(context);
   const { env, params } = context;
   const id = asId(params.id, 'Session ID');
-  const timezone = clubTimezone(env);
   const sql = getSql(env);
 
   const sessionRows = await sql`
@@ -23,11 +22,12 @@ export async function onRequestGet(context) {
       s.status,
       s.created_at,
       s.created_by::text AS created_by,
-      (s.session_date = (now() AT TIME ZONE ${timezone})::date) AS is_today,
-      (s.session_date < (now() AT TIME ZONE ${timezone})::date) AS is_past,
-      (s.session_date > (now() AT TIME ZONE ${timezone})::date) AS is_future
+      (s.session_date = (now() AT TIME ZONE ${club.timezone})::date) AS is_today,
+      (s.session_date < (now() AT TIME ZONE ${club.timezone})::date) AS is_past,
+      (s.session_date > (now() AT TIME ZONE ${club.timezone})::date) AS is_future
     FROM sessions s
     WHERE s.id = ${id}
+      AND s.club_id = ${club.id}
     LIMIT 1
   `;
 
@@ -53,7 +53,7 @@ export async function onRequestGet(context) {
   `;
 
   const mine = attendance.find(
-    (row) => user.member_id && row.member_id === user.member_id,
+    (row) => row.member_id === membership.id,
   ) || null;
 
   session.headcount = attendance.length;
@@ -63,8 +63,7 @@ export async function onRequestGet(context) {
   session.can_check_in = Boolean(
     session.is_today &&
     session.status === 'scheduled' &&
-    user.member_id &&
-    user.member_status === 'active' &&
+    membership.status === 'active' &&
     !mine,
   );
   session.can_undo_check_in = Boolean(
@@ -78,6 +77,7 @@ export async function onRequestGet(context) {
 
 export async function onRequestPatch(context) {
   requireAdmin(context);
+  const club = requireClub(context);
   const { request, env, params } = context;
   const id = asId(params.id, 'Session ID');
   const body = await readJson(request);
@@ -89,6 +89,7 @@ export async function onRequestPatch(context) {
       status
     FROM sessions
     WHERE id = ${id}
+      AND club_id = ${club.id}
     LIMIT 1
   `;
 
@@ -110,6 +111,7 @@ export async function onRequestPatch(context) {
     SET title = ${title},
         status = ${status}
     WHERE id = ${id}
+      AND club_id = ${club.id}
     RETURNING
       id::text AS id,
       session_date::text AS session_date,
@@ -123,12 +125,14 @@ export async function onRequestPatch(context) {
 
 export async function onRequestDelete(context) {
   requireAdmin(context);
+  const club = requireClub(context);
   const { env, params } = context;
   const id = asId(params.id, 'Session ID');
   const sql = getSql(env);
   const rows = await sql`
     DELETE FROM sessions
     WHERE id = ${id}
+      AND club_id = ${club.id}
     RETURNING id::text AS id
   `;
 

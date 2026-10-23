@@ -61,10 +61,9 @@ export default {
             title: this.form.title,
           },
         });
-        this.$router.push({
-          name: 'admin-session',
-          params: { id: data.session.id },
-        });
+        this.$router.push(
+          this.authStore.clubRoute('admin-session', { id: data.session.id }),
+        );
       } catch (error) {
         this.actionError = error.message;
       } finally {
@@ -128,10 +127,10 @@ export default {
         <p>Schedule runs and manage attendance.</p>
       </div>
       <div class="row">
-        <RouterLink class="btn btn-secondary" :to="{ name: 'sessions' }">
+        <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('sessions')">
           View public list
         </RouterLink>
-        <RouterLink class="btn btn-secondary" :to="{ name: 'admin-members' }">
+        <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('admin-members')">
           Manage roster
         </RouterLink>
       </div>
@@ -211,7 +210,7 @@ export default {
               <div class="row">
                 <RouterLink
                   class="btn btn-secondary btn-sm"
-                  :to="{ name: 'admin-session', params: { id: session.id } }"
+                  :to="authStore.clubRoute('admin-session', { id: session.id })"
                 >
                   Manage
                 </RouterLink>

@@ -123,11 +123,11 @@ export default {
         <RouterLink
           v-if="authStore.isAdmin"
           class="btn btn-secondary"
-          :to="{ name: 'admin-sessions' }"
+          :to="authStore.clubRoute('admin-sessions')"
         >
           Schedule a session
         </RouterLink>
-        <RouterLink class="btn btn-secondary" :to="{ name: 'sessions' }">
+        <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('sessions')">
           All sessions
         </RouterLink>
       </div>
@@ -169,14 +169,14 @@ export default {
           <RouterLink
             v-if="authStore.isAdmin"
             class="btn btn-secondary"
-            :to="{ name: 'admin-sessions' }"
+            :to="authStore.clubRoute('admin-sessions')"
           >
             Create a session
           </RouterLink>
           <RouterLink
             v-else-if="nextSession"
             class="btn btn-secondary"
-            :to="{ name: 'session-detail', params: { id: nextSession.id } }"
+            :to="authStore.clubRoute('session-detail', { id: nextSession.id })"
           >
             View next session
           </RouterLink>
@@ -192,7 +192,7 @@ export default {
           </div>
           <RouterLink
             class="btn btn-secondary"
-            :to="{ name: 'session-detail', params: { id: nextSession.id } }"
+            :to="authStore.clubRoute('session-detail', { id: nextSession.id })"
           >
             View
           </RouterLink>
@@ -202,7 +202,7 @@ export default {
       <section>
         <div class="section-title">
           <h2>Recent sessions</h2>
-          <RouterLink class="small" :to="{ name: 'sessions' }">View all</RouterLink>
+          <RouterLink class="small" :to="authStore.clubRoute('sessions')">View all</RouterLink>
         </div>
 
         <div v-if="recentSessions.length" class="list">

@@ -7,14 +7,33 @@ export class ApiError extends Error {
   }
 }
 
-export async function api(path, { method = 'GET', body } = {}) {
+let activeClubSlug = null;
+
+export function setApiClubSlug(slug) {
+  activeClubSlug = slug || null;
+}
+
+export async function api(path, {
+  method = 'GET',
+  body,
+  clubSlug = activeClubSlug,
+} = {}) {
   let response;
+  const headers = {};
+
+  if (body !== undefined) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  if (clubSlug) {
+    headers['X-Club-Slug'] = clubSlug;
+  }
 
   try {
     response = await fetch(`/api${path}`, {
       method,
       credentials: 'include',
-      headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
+      headers,
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch {

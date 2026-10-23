@@ -40,7 +40,13 @@ export default {
           this.email.trim(),
           this.password,
         );
-        this.$router.replace({ name: 'home' });
+        const redirect = typeof this.$route.query.redirect === 'string'
+          ? this.$route.query.redirect
+          : '/clubs';
+        const safeRedirect = redirect.startsWith('/') && !redirect.startsWith('//')
+          ? redirect
+          : '/clubs';
+        this.$router.replace(safeRedirect);
       } catch (error) {
         this.error = error.message;
       } finally {
@@ -59,9 +65,9 @@ export default {
         <span class="brand">{{ authStore.clubName }}</span>
       </div>
 
-      <h1 class="auth-title">Join the club</h1>
+      <h1 class="auth-title">Create your account</h1>
       <p class="auth-subtitle">
-        Create your account so you can check in on run days and track your attendance.
+        Then join a club, check in on run days, and track your attendance.
       </p>
 
       <AlertMessage type="error" :message="error" />
@@ -125,7 +131,7 @@ export default {
 
       <p class="auth-switch">
         Already have an account?
-        <RouterLink :to="{ name: 'login' }">Log in</RouterLink>
+        <RouterLink :to="{ name: 'login', query: $route.query }">Log in</RouterLink>
       </p>
     </div>
   </div>

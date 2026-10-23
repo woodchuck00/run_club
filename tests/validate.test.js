@@ -4,8 +4,11 @@ import {
   asEmail,
   asId,
   asName,
+  asOptionalDescription,
   asOptionalEmail,
   asPassword,
+  asSlug,
+  asTimezone,
   parseLimit,
 } from '../functions/_lib/validate.js';
 
@@ -30,6 +33,19 @@ describe('validation helpers', () => {
     expect(() => asName('   ')).toThrow('at least 1');
     expect(() => asPassword('short')).toThrow('at least 8');
     expect(asPassword('long-enough')).toBe('long-enough');
+  });
+
+  it('normalizes club URLs and rejects unsafe slugs', () => {
+    expect(asSlug('  Riverside-Run-Club ')).toBe('riverside-run-club');
+    expect(() => asSlug('bad slug')).toThrow('lowercase letters');
+    expect(() => asSlug('../admin')).toThrow('lowercase letters');
+  });
+
+  it('validates timezones and optional descriptions', () => {
+    expect(asTimezone('America/New_York')).toBe('America/New_York');
+    expect(() => asTimezone('Mars/Olympus')).toThrow('not valid');
+    expect(asOptionalDescription('  Tuesday nights  ')).toBe('Tuesday nights');
+    expect(asOptionalDescription('')).toBeNull();
   });
 
   it('only accepts numeric ids', () => {

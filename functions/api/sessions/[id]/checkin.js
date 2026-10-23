@@ -1,19 +1,18 @@
 import { HttpError, json } from '../../../_lib/http.js';
 import { getSql } from '../../../_lib/db.js';
-import { requireUser } from '../../../_lib/auth.js';
-import { clubTimezone } from '../../../_lib/config.js';
+import { requireClub, requireMembership } from '../../../_lib/clubs.js';
 import { asId } from '../../../_lib/validate.js';
 
-async function getCheckInSession(env, id) {
-  const timezone = clubTimezone(env);
+async function getCheckInSession(env, club, id) {
   const sql = getSql(env);
   const rows = await sql`
     SELECT
       id::text AS id,
       status,
-      (session_date = (now() AT TIME ZONE ${timezone})::date) AS is_today
+      (session_date = (now() AT TIME ZONE ${club.timezone})::date) AS is_today
     FROM sessions
     WHERE id = ${id}
+      AND club_id = ${club.id}
     LIMIT 1
   `;
 
@@ -21,20 +20,17 @@ async function getCheckInSession(env, id) {
 }
 
 export async function onRequestPost(context) {
-  const user = requireUser(context);
+  const membership = requireMembership(context);
+  const club = requireClub(context);
   const { env, params } = context;
   const id = asId(params.id, 'Session ID');
-  const session = await getCheckInSession(env, id);
+  const session = await getCheckInSession(env, club, id);
 
   if (!session) {
     throw new HttpError(404, 'Session not found');
   }
 
-  if (!user.member_id) {
-    throw new HttpError(400, 'Your account is not linked to a roster member');
-  }
-
-  if (user.member_status !== 'active') {
+  if (membership.status !== 'active') {
     throw new HttpError(403, 'Archived members cannot check in');
   }
 
@@ -49,7 +45,7 @@ export async function onRequestPost(context) {
   const sql = getSql(env);
   const rows = await sql`
     INSERT INTO attendance (session_id, member_id, source, marked_by)
-    VALUES (${id}, ${user.member_id}, 'self', ${user.id})
+    VALUES (${id}, ${membership.id}, 'self', ${membership.user_id})
     ON CONFLICT DO NOTHING
     RETURNING id::text AS id
   `;
@@ -62,7 +58,7 @@ export async function onRequestPost(context) {
     SELECT id::text AS id
     FROM attendance
     WHERE session_id = ${id}
-      AND member_id = ${user.member_id}
+      AND member_id = ${membership.id}
     LIMIT 1
   `;
 
@@ -70,24 +66,20 @@ export async function onRequestPost(context) {
 }
 
 export async function onRequestDelete(context) {
-  const user = requireUser(context);
+  const membership = requireMembership(context);
+  const club = requireClub(context);
   const { env, params } = context;
   const id = asId(params.id, 'Session ID');
-
-  if (!user.member_id) {
-    throw new HttpError(400, 'Your account is not linked to a roster member');
-  }
-
-  const timezone = clubTimezone(env);
   const sql = getSql(env);
   const rows = await sql`
     DELETE FROM attendance a
     USING sessions s
     WHERE a.session_id = s.id
       AND a.session_id = ${id}
-      AND a.member_id = ${user.member_id}
+      AND s.club_id = ${club.id}
+      AND a.member_id = ${membership.id}
       AND a.source = 'self'
-      AND s.session_date = (now() AT TIME ZONE ${timezone})::date
+      AND s.session_date = (now() AT TIME ZONE ${club.timezone})::date
     RETURNING a.id::text AS id
   `;
 

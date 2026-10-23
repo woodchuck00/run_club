@@ -48,6 +48,7 @@ export default {
   },
   watch: {
     '$route.params.id': 'load',
+    '$route.params.clubSlug': 'load',
   },
   mounted() {
     this.load();
@@ -170,7 +171,10 @@ export default {
 <template>
   <div class="container page">
     <div class="row" style="margin-bottom: 1rem">
-      <RouterLink class="small" :to="{ name: 'admin-sessions' }">
+      <RouterLink
+        class="small"
+        :to="{ name: 'admin-sessions', params: { clubSlug: $route.params.clubSlug } }"
+      >
         ← Back to admin sessions
       </RouterLink>
     </div>
@@ -206,7 +210,10 @@ export default {
         <div class="row">
           <RouterLink
             class="btn btn-secondary"
-            :to="{ name: 'session-detail', params: { id: session.id } }"
+            :to="{
+              name: 'session-detail',
+              params: { clubSlug: $route.params.clubSlug, id: session.id },
+            }"
           >
             View public page
           </RouterLink>
@@ -354,7 +361,10 @@ export default {
     <div v-else class="empty-state">
       <h3>Session not found</h3>
       <p style="margin-bottom: 1rem">It may have been deleted.</p>
-      <RouterLink class="btn btn-secondary" :to="{ name: 'admin-sessions' }">
+      <RouterLink
+        class="btn btn-secondary"
+        :to="{ name: 'admin-sessions', params: { clubSlug: $route.params.clubSlug } }"
+      >
         Back to admin sessions
       </RouterLink>
     </div>

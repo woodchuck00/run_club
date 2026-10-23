@@ -40,6 +40,49 @@ export function asOptionalEmail(value) {
   return asEmail(value);
 }
 
+export function asSlug(value) {
+  const slug = asString(value, 'Club URL', { min: 2, max: 60 }).toLowerCase();
+
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    throw new HttpError(
+      400,
+      'Club URL must use lowercase letters, numbers, and single hyphens',
+    );
+  }
+
+  return slug;
+}
+
+export function asTimezone(value) {
+  const timezone = asString(value, 'Timezone', { min: 1, max: 64 });
+
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: timezone }).format();
+  } catch {
+    throw new HttpError(400, 'Timezone is not valid');
+  }
+
+  return timezone;
+}
+
+export function asOptionalDescription(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  if (typeof value !== 'string') {
+    throw new HttpError(400, 'Description must be text');
+  }
+
+  const description = value.trim();
+
+  if (description.length > 280) {
+    throw new HttpError(400, 'Description must be at most 280 characters');
+  }
+
+  return description || null;
+}
+
 export function asPassword(value) {
   if (typeof value !== 'string' || value.length < 8) {
     throw new HttpError(400, 'Password must be at least 8 characters');

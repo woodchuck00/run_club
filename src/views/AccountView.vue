@@ -15,6 +15,8 @@ export default {
       error: '',
       success: '',
       submitting: false,
+      clubsLoading: true,
+      clubsError: '',
     };
   },
   computed: {
@@ -26,7 +28,22 @@ export default {
       return this.authStore.user;
     },
   },
+  mounted() {
+    this.loadClubs();
+  },
   methods: {
+    async loadClubs() {
+      this.clubsLoading = true;
+      this.clubsError = '';
+
+      try {
+        await this.authStore.loadClubs();
+      } catch (error) {
+        this.clubsError = error.message;
+      } finally {
+        this.clubsLoading = false;
+      }
+    },
     async submit() {
       if (this.submitting) {
         return;
@@ -66,7 +83,7 @@ export default {
     <div class="page-header">
       <div>
         <h1>Account</h1>
-        <p>Your profile and password.</p>
+        <p>Your profile, clubs, and password.</p>
       </div>
     </div>
 
@@ -75,16 +92,8 @@ export default {
         <div class="row">
           <span class="avatar avatar-lg" aria-hidden="true">{{ initial }}</span>
           <div class="stack-sm">
-            <h2>{{ user.member_name || user.name }}</h2>
-            <div class="row">
-              <span class="badge badge-primary">
-                {{ user.role === 'admin' ? 'Admin' : 'Member' }}
-              </span>
-              <span
-                v-if="user.member_status === 'archived'"
-                class="badge badge-warning"
-              >Archived</span>
-            </div>
+            <h2>{{ user.name }}</h2>
+            <span class="badge">Runner account</span>
           </div>
         </div>
 
@@ -94,10 +103,6 @@ export default {
           <div>
             <div class="stat-label">Email</div>
             <p class="wrap">{{ user.email }}</p>
-          </div>
-          <div>
-            <div class="stat-label">Roster name</div>
-            <p>{{ user.member_name || 'Not linked to a roster member' }}</p>
           </div>
         </div>
       </article>
@@ -150,5 +155,59 @@ export default {
         </form>
       </article>
     </div>
+
+    <section style="margin-top: 1.5rem">
+      <div class="section-title">
+        <div>
+          <h2>Your clubs</h2>
+          <p class="small muted">Every club you belong to with this account.</p>
+        </div>
+        <RouterLink class="btn btn-secondary btn-sm" :to="{ name: 'clubs' }">
+          Browse clubs
+        </RouterLink>
+      </div>
+
+      <AlertMessage type="error" :message="clubsError" />
+
+      <div v-if="clubsLoading" class="loading">
+        <span class="spinner" aria-hidden="true" />
+        <span>Loading clubs…</span>
+      </div>
+
+      <div v-else-if="authStore.myClubs.length" class="list">
+        <div
+          v-for="club in authStore.myClubs"
+          :key="club.id"
+          class="list-item"
+        >
+          <div class="stack-sm">
+            <strong>{{ club.name }}</strong>
+            <span class="small muted">
+              {{ club.active_members }} active members · {{ club.timezone }}
+            </span>
+          </div>
+          <div class="row">
+            <span
+              class="badge"
+              :class="club.role === 'admin' ? 'badge-accent' : ''"
+            >
+              {{ club.role }}
+            </span>
+            <RouterLink
+              class="btn btn-secondary btn-sm"
+              :to="{ name: 'home', params: { clubSlug: club.slug } }"
+            >
+              Open
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="empty-state">
+        <h3>No clubs joined</h3>
+        <p style="margin-bottom: 1rem">Join a club or create your own.</p>
+        <RouterLink class="btn" :to="{ name: 'clubs' }">Browse clubs</RouterLink>
+      </div>
+    </section>
   </div>
 </template>

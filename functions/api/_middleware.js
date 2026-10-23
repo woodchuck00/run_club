@@ -1,5 +1,10 @@
 import { HttpError, json } from '../_lib/http.js';
 import { getSessionUser } from '../_lib/auth.js';
+import {
+  clubSlugFromRequest,
+  getClubBySlug,
+  getClubMembership,
+} from '../_lib/clubs.js';
 
 const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
@@ -46,6 +51,22 @@ export async function onRequest(context) {
     }
 
     data.user = await getSessionUser(request, env);
+
+    const clubSlug = clubSlugFromRequest(request);
+
+    if (clubSlug) {
+      const club = await getClubBySlug(env, clubSlug);
+
+      if (!club) {
+        throw new HttpError(404, 'Club not found');
+      }
+
+      data.club = club;
+
+      if (data.user) {
+        data.membership = await getClubMembership(env, club.id, data.user.id);
+      }
+    }
 
     return withSecurityHeaders(await context.next());
   } catch (error) {

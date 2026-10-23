@@ -21,6 +21,8 @@ export default {
   methods: {
     handleUnauthorized() {
       this.authStore.user = null;
+      this.authStore.clubs = [];
+      this.authStore.clearClub();
 
       if (this.$route.name !== 'login') {
         this.$router.push({

@@ -28,7 +28,10 @@ export default {
 <template>
   <RouterLink
     class="card card-link"
-    :to="{ name: 'session-detail', params: { id: session.id } }"
+    :to="{
+      name: 'session-detail',
+      params: { clubSlug: $route.params.clubSlug, id: session.id },
+    }"
   >
     <div class="row-between">
       <div class="stack-sm">

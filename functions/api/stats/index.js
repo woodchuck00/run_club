@@ -1,7 +1,6 @@
 import { json } from '../../_lib/http.js';
 import { getSql } from '../../_lib/db.js';
-import { requireUser } from '../../_lib/auth.js';
-import { clubTimezone } from '../../_lib/config.js';
+import { requireClub, requireMembership } from '../../_lib/clubs.js';
 
 function asArray(value) {
   if (Array.isArray(value)) {
@@ -21,17 +20,18 @@ function asArray(value) {
 }
 
 export async function onRequestGet(context) {
-  requireUser(context);
+  requireMembership(context);
+  const club = requireClub(context);
   const { env } = context;
-  const timezone = clubTimezone(env);
   const sql = getSql(env);
 
   const totalsRows = await sql`
     WITH eligible AS (
       SELECT id, session_date, title
       FROM sessions
-      WHERE status = 'scheduled'
-        AND session_date <= (now() AT TIME ZONE ${timezone})::date
+      WHERE club_id = ${club.id}
+        AND status = 'scheduled'
+        AND session_date <= (now() AT TIME ZONE ${club.timezone})::date
     ), counts AS (
       SELECT e.id, COUNT(a.id)::int AS headcount
       FROM eligible e
@@ -46,7 +46,12 @@ export async function onRequestGet(context) {
     )
     SELECT
       (SELECT COUNT(*)::int FROM eligible) AS sessions_count,
-      (SELECT COUNT(*)::int FROM members WHERE status = 'active') AS active_members,
+      (
+        SELECT COUNT(*)::int
+        FROM members
+        WHERE club_id = ${club.id}
+          AND status = 'active'
+      ) AS active_members,
       (
         SELECT COUNT(*)::int
         FROM attendance a
@@ -68,15 +73,16 @@ export async function onRequestGet(context) {
         SELECT json_agg(session_date ORDER BY session_date DESC)
         FROM eligible
       ), '[]'::json) AS all_dates,
-      (now() AT TIME ZONE ${timezone})::date AS today
+      (now() AT TIME ZONE ${club.timezone})::date AS today
   `;
 
   const leaderboardRows = await sql`
     WITH eligible AS (
       SELECT id, session_date
       FROM sessions
-      WHERE status = 'scheduled'
-        AND session_date <= (now() AT TIME ZONE ${timezone})::date
+      WHERE club_id = ${club.id}
+        AND status = 'scheduled'
+        AND session_date <= (now() AT TIME ZONE ${club.timezone})::date
     ), attendance_dates AS (
       SELECT a.member_id, e.session_date
       FROM attendance a
@@ -94,7 +100,8 @@ export async function onRequestGet(context) {
       ) AS dates
     FROM members m
     LEFT JOIN attendance_dates ad ON ad.member_id = m.id
-    WHERE m.status = 'active'
+    WHERE m.club_id = ${club.id}
+      AND m.status = 'active'
     GROUP BY m.id
     ORDER BY attended DESC, lower(m.display_name)
     LIMIT 10

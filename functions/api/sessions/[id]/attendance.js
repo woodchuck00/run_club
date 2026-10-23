@@ -1,13 +1,14 @@
 import { HttpError, json, readJson } from '../../../_lib/http.js';
 import { getSql, pgErrorCode } from '../../../_lib/db.js';
-import { requireAdmin } from '../../../_lib/auth.js';
+import { requireAdmin, requireClub } from '../../../_lib/clubs.js';
 import {
   asGuestName,
   asId,
 } from '../../../_lib/validate.js';
 
 export async function onRequestPost(context) {
-  const user = requireAdmin(context);
+  const membership = requireAdmin(context);
+  const club = requireClub(context);
   const { request, env, params } = context;
   const id = asId(params.id, 'Session ID');
   const body = await readJson(request);
@@ -20,7 +21,11 @@ export async function onRequestPost(context) {
 
   const sql = getSql(env);
   const sessionRows = await sql`
-    SELECT id::text AS id FROM sessions WHERE id = ${id} LIMIT 1
+    SELECT id::text AS id
+    FROM sessions
+    WHERE id = ${id}
+      AND club_id = ${club.id}
+    LIMIT 1
   `;
 
   if (!sessionRows.length) {
@@ -33,6 +38,7 @@ export async function onRequestPost(context) {
       SELECT id::text AS id, display_name
       FROM members
       WHERE id = ${memberId}
+        AND club_id = ${club.id}
       LIMIT 1
     `;
 
@@ -43,7 +49,7 @@ export async function onRequestPost(context) {
     try {
       const rows = await sql`
         INSERT INTO attendance (session_id, member_id, source, marked_by)
-        VALUES (${id}, ${memberId}, 'admin', ${user.id})
+        VALUES (${id}, ${memberId}, 'admin', ${membership.user_id})
         RETURNING id::text AS id, member_id::text AS member_id, guest_name, source
       `;
 
@@ -67,7 +73,7 @@ export async function onRequestPost(context) {
   try {
     const rows = await sql`
       INSERT INTO attendance (session_id, guest_name, source, marked_by)
-      VALUES (${id}, ${guestName}, 'admin', ${user.id})
+      VALUES (${id}, ${guestName}, 'admin', ${membership.user_id})
       RETURNING id::text AS id, member_id::text AS member_id, guest_name, source
     `;
 

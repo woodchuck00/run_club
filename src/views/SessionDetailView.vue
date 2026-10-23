@@ -39,6 +39,7 @@ export default {
   },
   watch: {
     '$route.params.id': 'load',
+    '$route.params.clubSlug': 'load',
   },
   mounted() {
     this.load();
@@ -101,7 +102,9 @@ export default {
 <template>
   <div class="container page">
     <div class="row" style="margin-bottom: 1rem">
-      <RouterLink class="small" :to="{ name: 'sessions' }">← Back to sessions</RouterLink>
+      <RouterLink class="small" :to="authStore.clubRoute('sessions')">
+        ← Back to sessions
+      </RouterLink>
     </div>
 
     <AlertMessage type="error" :message="error" />
@@ -137,7 +140,7 @@ export default {
           <RouterLink
             v-if="authStore.isAdmin"
             class="btn btn-secondary"
-            :to="{ name: 'admin-session', params: { id: session.id } }"
+            :to="authStore.clubRoute('admin-session', { id: session.id })"
           >
             Manage attendance
           </RouterLink>
@@ -172,7 +175,7 @@ export default {
                 <span v-if="session.guest_count"> and {{ session.guest_count }} guests</span>
               </p>
             </div>
-            <RouterLink class="btn btn-secondary" :to="{ name: 'stats' }">
+            <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('stats')">
               View stats
             </RouterLink>
           </div>
@@ -223,7 +226,7 @@ export default {
     <div v-else class="empty-state">
       <h3>Session not found</h3>
       <p style="margin-bottom: 1rem">It may have been deleted.</p>
-      <RouterLink class="btn btn-secondary" :to="{ name: 'sessions' }">
+      <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('sessions')">
         Back to sessions
       </RouterLink>
     </div>

@@ -206,7 +206,10 @@ export default {
         <h1>Roster</h1>
         <p>Manage members, accounts, and admin access.</p>
       </div>
-      <RouterLink class="btn btn-secondary" :to="{ name: 'admin-sessions' }">
+      <RouterLink
+        class="btn btn-secondary"
+        :to="{ name: 'admin-sessions', params: { clubSlug: $route.params.clubSlug } }"
+      >
         Manage sessions
       </RouterLink>
     </div>

@@ -109,14 +109,9 @@ export async function getSessionUser(request, env) {
       u.id::text AS id,
       u.email,
       u.name,
-      u.role,
-      u.created_at,
-      m.id::text AS member_id,
-      m.display_name AS member_name,
-      m.status AS member_status
+      u.created_at
     FROM auth_sessions s
     JOIN users u ON u.id = s.user_id
-    LEFT JOIN members m ON m.user_id = u.id
     WHERE s.token_hash = ${tokenHash}
       AND s.expires_at > now()
     LIMIT 1
@@ -131,14 +126,4 @@ export function requireUser(context) {
   }
 
   return context.data.user;
-}
-
-export function requireAdmin(context) {
-  const user = requireUser(context);
-
-  if (user.role !== 'admin') {
-    throw new HttpError(403, 'Admin access required');
-  }
-
-  return user;
 }

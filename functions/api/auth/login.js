@@ -15,14 +15,9 @@ export async function onRequestPost(context) {
       u.id::text AS id,
       u.email,
       u.name,
-      u.role,
       u.created_at,
-      m.id::text AS member_id,
-      m.display_name AS member_name,
-      m.status AS member_status,
       (u.password_hash = crypt(${password}, u.password_hash)) AS valid
     FROM users u
-    LEFT JOIN members m ON m.user_id = u.id
     WHERE lower(u.email) = ${email}
     LIMIT 1
   `;

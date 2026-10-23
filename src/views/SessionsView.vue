@@ -73,7 +73,7 @@ export default {
       <RouterLink
         v-if="authStore.isAdmin"
         class="btn btn-secondary"
-        :to="{ name: 'admin-sessions' }"
+        :to="authStore.clubRoute('admin-sessions')"
       >
         Manage sessions
       </RouterLink>

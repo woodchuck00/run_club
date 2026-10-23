@@ -30,10 +30,10 @@ export default {
         await this.authStore.login(this.email.trim(), this.password);
         const redirect = typeof this.$route.query.redirect === 'string'
           ? this.$route.query.redirect
-          : '/';
+          : '/clubs';
         const safeRedirect = redirect.startsWith('/') && !redirect.startsWith('//')
           ? redirect
-          : '/';
+          : '/clubs';
         this.$router.replace(safeRedirect);
       } catch (error) {
         this.error = error.message;
@@ -54,7 +54,7 @@ export default {
       </div>
 
       <h1 class="auth-title">Welcome back</h1>
-      <p class="auth-subtitle">Log in to check in and see who has been running.</p>
+      <p class="auth-subtitle">Log in to open your run clubs and check in.</p>
 
       <AlertMessage type="error" :message="error" />
 
@@ -89,8 +89,10 @@ export default {
       </form>
 
       <p class="auth-switch">
-        New to the club?
-        <RouterLink :to="{ name: 'register' }">Create an account</RouterLink>
+        New here?
+        <RouterLink :to="{ name: 'register', query: $route.query }">
+          Create an account
+        </RouterLink>
       </p>
     </div>
   </div>
