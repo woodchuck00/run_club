@@ -10,6 +10,9 @@ export default {
     initial() {
       return initials(this.authStore.displayName) || 'RC';
     },
+    clubInitial() {
+      return initials(this.authStore.clubName) || 'RC';
+    },
     brandRoute() {
       return this.authStore.activeClub
         ? this.authStore.clubRoute('home')
@@ -29,7 +32,7 @@ export default {
   <header class="nav">
     <div class="container nav-inner">
       <RouterLink class="brand" :to="brandRoute">
-        <span class="brand-mark">{{ initials(authStore.clubName) || 'RC' }}</span>
+        <span class="brand-mark">{{ clubInitial }}</span>
         <span>{{ authStore.clubName }}</span>
       </RouterLink>
 
