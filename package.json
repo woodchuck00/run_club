@@ -1,0 +1,37 @@
+{
+  "name": "run-club",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "dev:api": "wrangler pages dev dist --port 8788",
+    "dev:all": "npm run build && concurrently -k -n api,web \"npm:dev:api\" \"npm:dev\"",
+    "db:setup": "node --env-file=.dev.vars db/setup.mjs",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "check": "npm run lint && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.38.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.38.0",
+    "eslint-plugin-vue": "^10.5.1",
+    "globals": "^16.4.0",
+    "vite": "^7.1.12",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.44.0"
+  }
+}

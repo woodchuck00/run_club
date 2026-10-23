@@ -1,0 +1,27 @@
+<script>
+export default {
+  name: 'StatCard',
+  props: {
+    label: {
+      type: String,
+      required: true,
+    },
+    value: {
+      type: [String, Number],
+      required: true,
+    },
+    hint: {
+      type: String,
+      default: '',
+    },
+  },
+};
+</script>
+
+<template>
+  <article class="card">
+    <div class="stat-label">{{ label }}</div>
+    <div class="stat-value">{{ value }}</div>
+    <div v-if="hint" class="stat-hint">{{ hint }}</div>
+  </article>
+</template>
