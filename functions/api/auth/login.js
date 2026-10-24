@@ -14,7 +14,7 @@ export async function onRequestPost(context) {
     SELECT
       u.id::text AS id,
       u.email,
-      u.name,
+      u.display_name,
       u.created_at,
       (u.password_hash = crypt(${password}, u.password_hash)) AS valid
     FROM users u
