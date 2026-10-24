@@ -22,7 +22,11 @@ export async function api(path, {
   const headers = {};
 
   if (body !== undefined) {
-    headers['Content-Type'] = 'application/json';
+    if (body instanceof FormData) {
+      // let the browser set Content-Type with the boundary
+    } else {
+      headers['Content-Type'] = 'application/json';
+    }
   }
 
   if (clubSlug) {
@@ -34,7 +38,7 @@ export async function api(path, {
       method,
       credentials: 'include',
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body instanceof FormData ? body : (body === undefined ? undefined : JSON.stringify(body)),
     });
   } catch {
     throw new ApiError('Could not reach the server');

@@ -20,6 +20,9 @@ export const useAuthStore = defineStore('auth', {
     displayName: (state) => (
       state.membership?.display_name || state.user?.name || ''
     ),
+    avatarUrl: (state) => (
+      state.membership?.avatar_url || state.user?.avatar_url || null
+    ),
     memberActive: (state) => state.membership?.status === 'active',
     timezone: (state) => state.activeClub?.timezone || 'UTC',
     clubName: (state) => state.activeClub?.name || 'Run Club',

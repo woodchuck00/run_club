@@ -2,3 +2,9 @@ name = "run-club"
 pages_build_output_dir = "dist"
 compatibility_date = "2026-10-01"
 compatibility_flags = ["nodejs_compat"]
+
+[env.production.vars]
+B2_BUCKET = "run-club00"
+B2_KEY_ID = "0057c3dddf310a90000000004"
+B2_APPLICATION_KEY = "K005ewL5QeLefBzoaQvHdzofCCSPsS4"
+B2_BUCKET_ID = "379c43bd4d1d6fb3a1100a19"

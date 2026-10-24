@@ -108,8 +108,12 @@ export async function getSessionUser(request, env) {
     SELECT
       u.id::text AS id,
       u.email,
-      u.name,
-      u.created_at
+      u.display_name AS "displayName",
+      u.bio,
+      u.social_links AS "socialLinks",
+      u.avatar_url AS "avatarUrl",
+      u.created_at,
+      u.role
     FROM auth_sessions s
     JOIN users u ON u.id = s.user_id
     WHERE s.token_hash = ${tokenHash}

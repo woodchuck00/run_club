@@ -2,11 +2,25 @@
 import { mapStores } from 'pinia';
 import { useAuthStore } from '../stores/auth';
 import { initials } from '../lib/format';
+import { api } from '../lib/api';
 
 export default {
   name: 'AppNav',
+  data() {
+    return {
+      signedAvatarUrl: '',
+      dropdownOpen: false,
+    };
+  },
+  mounted() {
+    this.loadAvatar();
+    this.$watch('authStore.user', () => this.loadAvatar(), { deep: true, immediate: true });
+  },
   computed: {
     ...mapStores(useAuthStore),
+    avatarUrl() {
+      return this.signedAvatarUrl || '';
+    },
     initial() {
       return initials(this.authStore.displayName) || 'RC';
     },
@@ -20,6 +34,19 @@ export default {
     },
   },
   methods: {
+    async loadAvatar() {
+      if (this.authStore.user?.avatarUrl) {
+        const url = new URL(this.authStore.user.avatarUrl);
+        const parts = url.pathname.split('/');
+        const key = parts.slice(parts.indexOf('run-club00') + 1).join('/');
+        try {
+          const res = await api(`/auth/me?key=${encodeURIComponent(key)}`);
+          this.signedAvatarUrl = res.url || '';
+        } catch {
+          this.signedAvatarUrl = '';
+        }
+      }
+    },
     async logout() {
       await this.authStore.logout();
       this.$router.push({ name: 'login' });
@@ -53,14 +80,24 @@ export default {
             </RouterLink>
           </template>
         </template>
-        <RouterLink class="nav-link" :to="{ name: 'clubs' }">All clubs</RouterLink>
-        <RouterLink class="nav-link" :to="{ name: 'account' }">Account</RouterLink>
+
       </nav>
 
       <div v-if="authStore.isAuthenticated" class="nav-user">
-        <span class="avatar" aria-hidden="true">{{ initial }}</span>
+        <div class="avatar-dropdown">
+          <button type="button" class="avatar-btn" aria-label="Menu" @click="dropdownOpen = !dropdownOpen">
+            <img v-if="avatarUrl" class="avatar" :src="avatarUrl" alt="Avatar" aria-hidden="true" />
+            <span v-else class="avatar" aria-hidden="true">{{ initial }}</span>
+            <i class="fa-solid fa-chevron-down dropdown-arrow" :class="{ 'dropdown-open': dropdownOpen }" aria-hidden="true"></i>
+          </button>
+          <div v-if="dropdownOpen" class="dropdown-menu">
+            <RouterLink class="dropdown-item" :to="{ name: 'public-profile', params: { id: authStore.user?.id } }">Profile</RouterLink>
+            <RouterLink class="dropdown-item" :to="{ name: 'clubs' }">All clubs</RouterLink>
+            <RouterLink class="dropdown-item" :to="{ name: 'account' }">Account</RouterLink>
+            <button class="dropdown-item" type="button" @click="logout">Log out</button>
+          </div>
+        </div>
         <span class="small muted">{{ authStore.displayName }}</span>
-        <button class="btn btn-secondary btn-sm" type="button" @click="logout">Log out</button>
       </div>
 
       <div v-else class="nav-links">

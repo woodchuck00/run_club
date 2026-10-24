@@ -169,16 +169,41 @@ export function asEnum(value, field, allowed) {
   return option;
 }
 
-export function parseLimit(value, fallback = 100, max = 200) {
-  if (value === null || value === undefined || value === '') {
-    return fallback;
+export function asOptionalText(value, max = 1000) {
+  if (value === undefined || value === null || value === '') {
+    return null;
   }
 
-  const parsed = Number.parseInt(String(value), 10);
-
-  if (!Number.isInteger(parsed) || parsed < 1) {
-    return fallback;
+  if (typeof value !== 'string') {
+    throw new HttpError(400, 'Field must be text');
   }
 
-  return Math.min(parsed, max);
+  const text = value.trim();
+
+  if (text.length > max) {
+    throw new HttpError(400, `Field must be at most ${max} characters`);
+  }
+
+  return text || null;
+}
+
+export function asOptionalJsonb(value, maxKeys = 10) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  if (typeof value !== 'object') {
+    throw new HttpError(400, 'Field must be JSON');
+  }
+
+  if (Object.keys(value).length > maxKeys) {
+    throw new HttpError(400, `Field must not contain more than ${maxKeys} keys`);
+  }
+
+  return JSON.stringify(value);
+}
+
+export function parseLimit(value, defaultValue = 20) {
+  const n = Number.parseInt(value, 10);
+  return Number.isNaN(n) ? defaultValue : Math.max(1, n);
 }

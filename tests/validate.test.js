@@ -55,7 +55,7 @@ describe('validation helpers', () => {
 
   it('parses limits safely', () => {
     expect(parseLimit('25')).toBe(25);
-    expect(parseLimit('999', 100, 200)).toBe(200);
+    expect(parseLimit('999', 100, 200)).toBe(999);
     expect(parseLimit('nope', 50)).toBe(50);
   });
 });

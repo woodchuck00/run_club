@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS users (
   name text NOT NULL,
   password_hash text NOT NULL,
   role text NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+  bio text,
+  social_links jsonb,
+  avatar_url text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 

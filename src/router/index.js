@@ -10,6 +10,7 @@ import SessionsView from '../views/SessionsView.vue';
 import SessionDetailView from '../views/SessionDetailView.vue';
 import StatsView from '../views/StatsView.vue';
 import AccountView from '../views/AccountView.vue';
+import PublicProfileView from '../views/PublicProfileView.vue';
 import AdminSessionsView from '../views/admin/AdminSessionsView.vue';
 import AdminSessionView from '../views/admin/AdminSessionView.vue';
 import AdminMembersView from '../views/admin/AdminMembersView.vue';
@@ -137,6 +138,11 @@ const routes = [
       requiresMembership: true,
       requiresAdmin: true,
     },
+  },
+  {
+    path: '/user/:id',
+    name: 'public-profile',
+    component: PublicProfileView,
   },
   {
     path: '/:pathMatch(.*)*',
