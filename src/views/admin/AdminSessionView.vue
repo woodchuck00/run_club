@@ -172,10 +172,11 @@ export default {
   <div class="container page">
     <div class="row" style="margin-bottom: 1rem">
       <RouterLink
-        class="small"
+        class="small icon-text"
         :to="{ name: 'admin-sessions', params: { clubSlug: $route.params.clubSlug } }"
       >
-        ← Back to admin sessions
+        <i class="fa-solid fa-arrow-left" aria-hidden="true" />
+        <span>Back to admin sessions</span>
       </RouterLink>
     </div>
 
@@ -215,6 +216,7 @@ export default {
               params: { clubSlug: $route.params.clubSlug, id: session.id },
             }"
           >
+            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
             View public page
           </RouterLink>
           <button
@@ -223,6 +225,10 @@ export default {
             :disabled="busyKey === 'status'"
             @click="toggleStatus"
           >
+            <i
+              :class="session.status === 'cancelled' ? 'fa-solid fa-rotate-left' : 'fa-solid fa-ban'"
+              aria-hidden="true"
+            />
             {{ session.status === 'cancelled' ? 'Reactivate session' : 'Cancel session' }}
           </button>
         </div>
@@ -268,6 +274,7 @@ export default {
                 :disabled="busyKey === `attendance-${record.id}`"
                 @click="removeAttendance(record)"
               >
+                <i class="fa-solid fa-trash" aria-hidden="true" />
                 Remove
               </button>
             </div>
@@ -320,6 +327,7 @@ export default {
                   :disabled="busyKey === `member-${member.id}`"
                   @click="addMember(member)"
                 >
+                  <i class="fa-solid fa-user-plus" aria-hidden="true" />
                   Add
                 </button>
               </div>
@@ -347,6 +355,7 @@ export default {
                 />
               </div>
               <button class="btn" type="submit" :disabled="busyKey === 'guest'">
+                <i class="fa-solid fa-user-plus" aria-hidden="true" />
                 {{ busyKey === 'guest' ? 'Adding…' : 'Add guest' }}
               </button>
             </form>
@@ -365,6 +374,7 @@ export default {
         class="btn btn-secondary"
         :to="{ name: 'admin-sessions', params: { clubSlug: $route.params.clubSlug } }"
       >
+        <i class="fa-solid fa-arrow-left" aria-hidden="true" />
         Back to admin sessions
       </RouterLink>
     </div>

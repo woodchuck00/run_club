@@ -4,8 +4,10 @@ import {
   asEmail,
   asId,
   asName,
+  asOptionalBirthdate,
   asOptionalDescription,
   asOptionalEmail,
+  asOptionalEnum,
   asPassword,
   asSlug,
   asTimezone,
@@ -57,5 +59,18 @@ describe('validation helpers', () => {
     expect(parseLimit('25')).toBe(25);
     expect(parseLimit('999', 100, 200)).toBe(999);
     expect(parseLimit('nope', 50)).toBe(50);
+  });
+
+  it('validates optional birthdates and enum values', () => {
+    expect(asOptionalBirthdate('1990-06-15')).toBe('1990-06-15');
+    expect(asOptionalBirthdate('')).toBeNull();
+    expect(() => asOptionalBirthdate('2999-01-01')).toThrow('cannot be in the future');
+    expect(() => asOptionalBirthdate('1990-02-30')).toThrow('not a valid date');
+    expect(() => asOptionalBirthdate('15/06/1990')).toThrow('YYYY-MM-DD');
+
+    expect(asOptionalEnum('single', 'Marital status', ['single', 'married'])).toBe('single');
+    expect(asOptionalEnum('', 'Marital status', ['single', 'married'])).toBeNull();
+    expect(() => asOptionalEnum('widowed', 'Marital status', ['single', 'married']))
+      .toThrow('must be one of');
   });
 });

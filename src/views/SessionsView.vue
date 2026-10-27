@@ -75,6 +75,7 @@ export default {
         class="btn btn-secondary"
         :to="authStore.clubRoute('admin-sessions')"
       >
+        <i class="fa-solid fa-sliders" aria-hidden="true" />
         Manage sessions
       </RouterLink>
     </div>
@@ -97,6 +98,7 @@ export default {
             :aria-selected="filter === 'all'"
             @click="filter = 'all'"
           >
+            <i class="fa-solid fa-list" aria-hidden="true" />
             All sessions
           </button>
           <button
@@ -107,6 +109,7 @@ export default {
             :aria-selected="filter === 'attended'"
             @click="filter = 'attended'"
           >
+            <i class="fa-solid fa-user-check" aria-hidden="true" />
             My attendance ({{ attendedCount }})
           </button>
         </div>

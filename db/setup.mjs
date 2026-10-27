@@ -23,6 +23,20 @@ for (const statement of statements) {
 
 console.log('Database schema applied.');
 
+const userColumns = await sql`
+  SELECT column_name
+  FROM information_schema.columns
+  WHERE table_schema = 'public'
+    AND table_name = 'users'
+`;
+const userColumnNames = new Set(userColumns.map((column) => column.column_name));
+
+if (userColumnNames.has('name') && !userColumnNames.has('display_name')) {
+  await sql`ALTER TABLE users RENAME COLUMN name TO display_name`;
+} else if (userColumnNames.has('name') && userColumnNames.has('display_name')) {
+  await sql`UPDATE users SET display_name = name WHERE display_name IS NULL`;
+}
+
 function normalizeSlug(value) {
   return String(value || '')
     .trim()
@@ -102,7 +116,7 @@ if (adminPassword.length < 8) {
 }
 
 const adminRows = await sql`
-  INSERT INTO users (email, name, password_hash, role)
+  INSERT INTO users (email, display_name, password_hash, role)
   VALUES (
     ${adminEmail.toLowerCase()},
     ${adminName},
@@ -110,10 +124,10 @@ const adminRows = await sql`
     'admin'
   )
   ON CONFLICT (lower(email)) DO UPDATE
-    SET name = EXCLUDED.name,
+    SET display_name = EXCLUDED.display_name,
         role = 'admin',
         password_hash = EXCLUDED.password_hash
-  RETURNING id::text AS id, email, name
+  RETURNING id::text AS id, email, display_name AS name
 `;
 
 const admin = adminRows[0];

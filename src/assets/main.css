@@ -182,6 +182,18 @@ button {
   flex-wrap: wrap;
 }
 
+.icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.icon-text > i {
+  color: inherit;
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
 .grid {
   display: grid;
   gap: 1rem;
@@ -404,10 +416,18 @@ textarea {
 }
 
 .alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
   border-radius: var(--radius-sm);
   padding: 0.75rem 0.95rem;
   font-size: 0.9rem;
   border: 1px solid transparent;
+}
+
+.alert > i {
+  flex: 0 0 auto;
+  margin-top: 0.15em;
 }
 
 .alert-error {
@@ -580,12 +600,147 @@ tbody tr:hover {
   color: var(--muted);
 }
 
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.social-link:hover {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.social-link > i:first-child {
+  width: 1.15rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.social-link-external {
+  margin-left: 0.1rem;
+  font-size: 0.7rem;
+  opacity: 0.65;
+}
+
+.social-link-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.social-link-field > i {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+.social-link-field > input {
+  padding-left: 2.55rem;
+}
+
+.social-link-field:focus-within > i {
+  color: var(--primary);
+}
+
+.session-chevron {
+  margin-top: 0.15rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.cropper-viewport {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #0d120f;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.cropper-viewport:active {
+  cursor: grabbing;
+}
+
+.cropper-image {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.cropper-image-loading {
+  opacity: 0;
+}
+
+.cropper-guide {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 9999px rgba(10, 20, 14, 0.45);
+  pointer-events: none;
+}
+
+.cropper-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.cropper-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.cropper-controls > label {
+  font-size: 0.86rem;
+  font-weight: 650;
+  color: var(--muted);
+}
+
+.cropper-controls input[type="range"] {
+  flex: 1;
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--primary);
+  box-shadow: none;
+}
+
 .stat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.stat-icon {
+  color: var(--primary);
+  font-size: 0.95em;
 }
 
 .stat-value {
@@ -660,6 +815,9 @@ tbody tr:hover {
 }
 
 .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   color: var(--muted);
   border-radius: 999px;
   padding: 0.4rem 0.75rem;
@@ -735,14 +893,21 @@ tbody tr:hover {
 }
 
 .dropdown-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
   padding: 0.45rem 0.75rem;
+  border: 0;
   border-radius: 999px;
+  background: transparent;
   color: var(--text);
   font-size: 0.88rem;
   font-weight: 600;
+  text-align: left;
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .dropdown-item:hover {
@@ -794,6 +959,12 @@ tbody tr:hover {
   text-align: center;
   font-size: 0.9rem;
   color: var(--muted);
+}
+
+.auth-switch a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .checkin-card {
@@ -984,6 +1155,9 @@ tbody tr:hover {
 }
 
 .tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   border: 0;
   background: transparent;
   color: var(--muted);

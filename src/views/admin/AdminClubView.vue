@@ -113,9 +113,11 @@ export default {
       </div>
       <div class="row">
         <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('admin-members')">
+          <i class="fa-solid fa-users" aria-hidden="true" />
           Manage roster
         </RouterLink>
         <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('admin-sessions')">
+          <i class="fa-solid fa-calendar-days" aria-hidden="true" />
           Manage sessions
         </RouterLink>
       </div>
@@ -162,6 +164,7 @@ export default {
           </div>
 
           <button class="btn" type="submit" :disabled="saving">
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true" />
             {{ saving ? 'Saving…' : 'Save changes' }}
           </button>
         </form>
@@ -193,9 +196,11 @@ export default {
 
         <div class="row">
           <button class="btn btn-secondary" type="button" @click="copyLink">
+            <i :class="copied ? 'fa-solid fa-check' : 'fa-solid fa-copy'" aria-hidden="true" />
             {{ copied ? 'Copied' : 'Copy join link' }}
           </button>
           <a class="btn btn-secondary" :href="joinUrl" target="_blank" rel="noreferrer">
+            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
             Open join page
           </a>
         </div>

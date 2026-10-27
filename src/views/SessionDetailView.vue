@@ -102,8 +102,9 @@ export default {
 <template>
   <div class="container page">
     <div class="row" style="margin-bottom: 1rem">
-      <RouterLink class="small" :to="authStore.clubRoute('sessions')">
-        ← Back to sessions
+      <RouterLink class="small icon-text" :to="authStore.clubRoute('sessions')">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true" />
+        <span>Back to sessions</span>
       </RouterLink>
     </div>
 
@@ -142,6 +143,7 @@ export default {
             class="btn btn-secondary"
             :to="authStore.clubRoute('admin-session', { id: session.id })"
           >
+            <i class="fa-solid fa-user-check" aria-hidden="true" />
             Manage attendance
           </RouterLink>
         </div>
@@ -176,6 +178,7 @@ export default {
               </p>
             </div>
             <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('stats')">
+              <i class="fa-solid fa-chart-simple" aria-hidden="true" />
               View stats
             </RouterLink>
           </div>
@@ -227,6 +230,7 @@ export default {
       <h3>Session not found</h3>
       <p style="margin-bottom: 1rem">It may have been deleted.</p>
       <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('sessions')">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true" />
         Back to sessions
       </RouterLink>
     </div>

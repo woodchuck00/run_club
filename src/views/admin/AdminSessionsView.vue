@@ -128,9 +128,11 @@ export default {
       </div>
       <div class="row">
         <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('sessions')">
+          <i class="fa-solid fa-list" aria-hidden="true" />
           View public list
         </RouterLink>
         <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('admin-members')">
+          <i class="fa-solid fa-users" aria-hidden="true" />
           Manage roster
         </RouterLink>
       </div>
@@ -166,6 +168,7 @@ export default {
 
         <div class="field" style="align-self: end">
           <button class="btn" type="submit" :disabled="submitting">
+            <i class="fa-solid fa-calendar-plus" aria-hidden="true" />
             {{ submitting ? 'Creating…' : 'Create session' }}
           </button>
         </div>
@@ -212,6 +215,7 @@ export default {
                   class="btn btn-secondary btn-sm"
                   :to="authStore.clubRoute('admin-session', { id: session.id })"
                 >
+                  <i class="fa-solid fa-user-check" aria-hidden="true" />
                   Manage
                 </RouterLink>
                 <button
@@ -220,6 +224,10 @@ export default {
                   :disabled="busyId === session.id"
                   @click="toggleStatus(session)"
                 >
+                  <i
+                    :class="session.status === 'cancelled' ? 'fa-solid fa-rotate-left' : 'fa-solid fa-ban'"
+                    aria-hidden="true"
+                  />
                   {{ session.status === 'cancelled' ? 'Reactivate' : 'Cancel' }}
                 </button>
                 <button
@@ -228,6 +236,7 @@ export default {
                   :disabled="busyId === session.id"
                   @click="removeSession(session)"
                 >
+                  <i class="fa-solid fa-trash" aria-hidden="true" />
                   Delete
                 </button>
               </div>

@@ -133,12 +133,16 @@ export default {
           </div>
 
           <button class="btn btn-block" type="submit" :disabled="submitting">
+            <i class="fa-solid fa-circle-plus" aria-hidden="true" />
             {{ submitting ? 'Creating club…' : 'Create club' }}
           </button>
         </form>
 
         <p class="auth-switch">
-          <RouterLink :to="{ name: 'clubs' }">Back to all clubs</RouterLink>
+          <RouterLink :to="{ name: 'clubs' }">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true" />
+            Back to all clubs
+          </RouterLink>
         </p>
       </div>
     </div>

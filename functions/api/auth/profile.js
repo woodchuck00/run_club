@@ -1,7 +1,21 @@
 import { HttpError, json } from '../../_lib/http.js';
 import { getSql } from '../../_lib/db.js';
-import { asName } from '../../_lib/validate.js';
+import { asName, asOptionalBirthdate, asOptionalEnum } from '../../_lib/validate.js';
 import { requireUser } from '../../_lib/auth.js';
+
+const SEX_OPTIONS = ['female', 'male', 'non-binary', 'other', 'prefer not to say'];
+const MARITAL_STATUS_OPTIONS = [
+  'single',
+  'married',
+  'partnered',
+  'divorced',
+  'widowed',
+  'prefer not to say',
+];
+
+function asBoolean(value) {
+  return value === 'true' || value === 'on' || value === '1';
+}
 
 async function uploadToB2(file, filename, env) {
   const { B2_KEY_ID, B2_APPLICATION_KEY, B2_BUCKET, B2_BUCKET_ID } = env;
@@ -71,6 +85,16 @@ export async function onRequestPost(context) {
   const socialLinks = formData.get('socialLinks') ?? null;
   const displayName = asName(formData.get('displayName')) ?? null;
   const email = formData.get('email') || null;
+  const birthdate = asOptionalBirthdate(formData.get('birthdate'));
+  const sex = asOptionalEnum(formData.get('sex'), 'Sex', SEX_OPTIONS);
+  const maritalStatus = asOptionalEnum(
+    formData.get('maritalStatus'),
+    'Marital status',
+    MARITAL_STATUS_OPTIONS,
+  );
+  const birthdatePublic = asBoolean(formData.get('birthdatePublic'));
+  const sexPublic = asBoolean(formData.get('sexPublic'));
+  const maritalStatusPublic = asBoolean(formData.get('maritalStatusPublic'));
 
   let avatarUrl = user.avatarUrl || null;
   if (formData.has('avatar')) {
@@ -96,12 +120,23 @@ export async function onRequestPost(context) {
         social_links = ${socialLinks},
         display_name = ${displayName},
         email = ${email},
-        avatar_url = ${avatarUrl}
+        avatar_url = ${avatarUrl},
+        birthdate = ${birthdate},
+        sex = ${sex},
+        marital_status = ${maritalStatus},
+        birthdate_public = ${birthdatePublic},
+        sex_public = ${sexPublic},
+        marital_status_public = ${maritalStatusPublic}
     WHERE id = ${user.id}
     RETURNING id::text AS id, email, display_name, bio,
               social_links AS socialLinks,
               avatar_url AS avatarUrl,
               display_name AS displayName,
+              birthdate, sex,
+              marital_status AS "maritalStatus",
+              birthdate_public AS "birthdatePublic",
+              sex_public AS "sexPublic",
+              marital_status_public AS "maritalStatusPublic",
               role, created_at
   `;
 

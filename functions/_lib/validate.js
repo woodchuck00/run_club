@@ -169,6 +169,53 @@ export function asEnum(value, field, allowed) {
   return option;
 }
 
+export function asOptionalEnum(value, field, allowed) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  return asEnum(value, field, allowed);
+}
+
+export function asOptionalBirthdate(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  const birthdate = asString(value, 'Birthdate', { min: 10, max: 10 });
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthdate);
+
+  if (!match) {
+    throw new HttpError(400, 'Birthdate must use YYYY-MM-DD');
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    throw new HttpError(400, 'Birthdate is not a valid date');
+  }
+
+  const today = new Date();
+  const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+
+  if (parsed.getTime() > todayUtc) {
+    throw new HttpError(400, 'Birthdate cannot be in the future');
+  }
+
+  if (year < 1900) {
+    throw new HttpError(400, 'Birthdate must be after 1900');
+  }
+
+  return birthdate;
+}
+
 export function asOptionalText(value, max = 1000) {
   if (value === undefined || value === null || value === '') {
     return null;

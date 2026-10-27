@@ -49,7 +49,7 @@ export default {
         <div class="modal-header">
           <h2>{{ title }}</h2>
           <button class="icon-button" type="button" aria-label="Close" @click="$emit('close')">
-            ×
+            <i class="fa-solid fa-xmark" aria-hidden="true" />
           </button>
         </div>
         <slot />

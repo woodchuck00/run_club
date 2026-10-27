@@ -125,13 +125,17 @@ export default {
         </div>
 
         <button class="btn btn-block" type="submit" :disabled="submitting">
+          <i class="fa-solid fa-user-plus" aria-hidden="true" />
           {{ submitting ? 'Creating account…' : 'Create account' }}
         </button>
       </form>
 
       <p class="auth-switch">
         Already have an account?
-        <RouterLink :to="{ name: 'login', query: $route.query }">Log in</RouterLink>
+        <RouterLink :to="{ name: 'login', query: $route.query }">
+          <i class="fa-solid fa-right-to-bracket" aria-hidden="true" />
+          Log in
+        </RouterLink>
       </p>
     </div>
   </div>

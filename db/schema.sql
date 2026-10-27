@@ -9,14 +9,29 @@ CREATE TABLE IF NOT EXISTS app_meta (
 CREATE TABLE IF NOT EXISTS users (
   id bigserial PRIMARY KEY,
   email text NOT NULL,
-  name text NOT NULL,
+  display_name text NOT NULL,
   password_hash text NOT NULL,
   role text NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
   bio text,
   social_links jsonb,
   avatar_url text,
+  birthdate date,
+  sex text,
+  marital_status text,
+  birthdate_public boolean NOT NULL DEFAULT false,
+  sex_public boolean NOT NULL DEFAULT false,
+  marital_status_public boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS birthdate date;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS sex text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS marital_status text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS birthdate_public boolean NOT NULL DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS sex_public boolean NOT NULL DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS marital_status_public boolean NOT NULL DEFAULT false;
+ALTER TABLE users DROP COLUMN IF EXISTS age;
+ALTER TABLE users DROP COLUMN IF EXISTS age_public;
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_email_lower_uidx ON users (lower(email));
 

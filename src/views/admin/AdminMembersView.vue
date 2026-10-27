@@ -210,6 +210,7 @@ export default {
         class="btn btn-secondary"
         :to="{ name: 'admin-sessions', params: { clubSlug: $route.params.clubSlug } }"
       >
+        <i class="fa-solid fa-calendar-days" aria-hidden="true" />
         Manage sessions
       </RouterLink>
     </div>
@@ -252,6 +253,7 @@ export default {
 
         <div class="field" style="align-self: end">
           <button class="btn" type="submit" :disabled="addSubmitting">
+            <i class="fa-solid fa-user-plus" aria-hidden="true" />
             {{ addSubmitting ? 'Adding…' : 'Add member' }}
           </button>
         </div>
@@ -268,6 +270,7 @@ export default {
           :aria-selected="filter === 'active'"
           @click="filter = 'active'"
         >
+          <i class="fa-solid fa-user-check" aria-hidden="true" />
           Active ({{ activeCount }})
         </button>
         <button
@@ -278,6 +281,7 @@ export default {
           :aria-selected="filter === 'archived'"
           @click="filter = 'archived'"
         >
+          <i class="fa-solid fa-box-archive" aria-hidden="true" />
           Archived ({{ archivedCount }})
         </button>
         <button
@@ -288,6 +292,7 @@ export default {
           :aria-selected="filter === 'all'"
           @click="filter = 'all'"
         >
+          <i class="fa-solid fa-users" aria-hidden="true" />
           All ({{ members.length }})
         </button>
       </div>
@@ -357,6 +362,7 @@ export default {
                   type="button"
                   @click="openEdit(member)"
                 >
+                  <i class="fa-solid fa-pen" aria-hidden="true" />
                   Edit
                 </button>
                 <button
@@ -365,6 +371,10 @@ export default {
                   :disabled="busyId === member.id"
                   @click="setStatus(member, member.status === 'active' ? 'archived' : 'active')"
                 >
+                  <i
+                    :class="member.status === 'active' ? 'fa-solid fa-box-archive' : 'fa-solid fa-rotate-left'"
+                    aria-hidden="true"
+                  />
                   {{ member.status === 'active' ? 'Archive' : 'Reactivate' }}
                 </button>
                 <button
@@ -374,6 +384,10 @@ export default {
                   :disabled="busyId === member.id"
                   @click="toggleRole(member)"
                 >
+                  <i
+                    :class="member.role === 'admin' ? 'fa-solid fa-user-minus' : 'fa-solid fa-user-shield'"
+                    aria-hidden="true"
+                  />
                   {{ member.role === 'admin' ? 'Remove admin' : 'Make admin' }}
                 </button>
               </div>
@@ -420,6 +434,7 @@ export default {
 
       <template #footer>
         <button class="btn btn-secondary" type="button" @click="closeEdit">
+          <i class="fa-solid fa-xmark" aria-hidden="true" />
           Cancel
         </button>
         <button
@@ -428,6 +443,7 @@ export default {
           form="edit-member-form"
           :disabled="editSubmitting"
         >
+          <i class="fa-solid fa-floppy-disk" aria-hidden="true" />
           {{ editSubmitting ? 'Saving…' : 'Save changes' }}
         </button>
       </template>

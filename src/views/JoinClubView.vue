@@ -56,9 +56,15 @@ export default {
         </div>
 
         <div class="row small muted">
-          <span>{{ club.active_members }} active members</span>
+          <span class="icon-text">
+            <i class="fa-solid fa-users" aria-hidden="true" />
+            <span>{{ club.active_members }} active members</span>
+          </span>
           <span>·</span>
-          <span>{{ club.sessions_count }} sessions</span>
+          <span class="icon-text">
+            <i class="fa-solid fa-calendar-days" aria-hidden="true" />
+            <span>{{ club.sessions_count }} sessions</span>
+          </span>
           <span>·</span>
           <span>{{ club.timezone }}</span>
         </div>
@@ -66,11 +72,15 @@ export default {
         <AlertMessage type="error" :message="error" />
 
         <button class="btn btn-block" type="button" :disabled="joining" @click="join">
+          <i class="fa-solid fa-right-to-bracket" aria-hidden="true" />
           {{ joining ? 'Joining…' : `Join ${club.name}` }}
         </button>
 
         <p class="auth-switch" style="margin-top: 0">
-          <RouterLink :to="{ name: 'clubs' }">Browse other clubs</RouterLink>
+          <RouterLink :to="{ name: 'clubs' }">
+            <i class="fa-solid fa-compass" aria-hidden="true" />
+            Browse other clubs
+          </RouterLink>
         </p>
       </div>
     </div>

@@ -66,7 +66,7 @@ export async function onRequestPost(context) {
   try {
     const rows = await sql`
       INSERT INTO members (club_id, user_id, display_name, email)
-      VALUES (${club.id}, ${user.id}, ${user.name}, ${user.email})
+      VALUES (${club.id}, ${user.id}, ${user.displayName}, ${user.email})
       RETURNING
         id::text AS id,
         club_id::text AS club_id,

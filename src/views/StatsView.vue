@@ -73,13 +73,29 @@ export default {
 
     <div v-else class="stack">
       <div class="grid grid-3">
-        <StatCard label="Sessions" :value="totals.sessions" hint="Held so far" />
-        <StatCard label="Active members" :value="totals.activeMembers" hint="On the roster" />
-        <StatCard label="Check-ins" :value="totals.checkIns" hint="All time" />
+        <StatCard
+          label="Sessions"
+          :value="totals.sessions"
+          hint="Held so far"
+          icon="fa-solid fa-calendar-days"
+        />
+        <StatCard
+          label="Active members"
+          :value="totals.activeMembers"
+          hint="On the roster"
+          icon="fa-solid fa-users"
+        />
+        <StatCard
+          label="Check-ins"
+          :value="totals.checkIns"
+          hint="All time"
+          icon="fa-solid fa-clipboard-check"
+        />
         <StatCard
           label="Average turnout"
           :value="totals.averageHeadcount"
           :hint="averageHint"
+          icon="fa-solid fa-chart-simple"
         />
       </div>
 
@@ -123,6 +139,7 @@ export default {
                 <td>{{ member.attended }}</td>
                 <td>
                   <span v-if="member.streak" class="badge badge-primary">
+                    <i class="fa-solid fa-fire" aria-hidden="true" />
                     {{ member.streak }} in a row
                   </span>
                   <span v-else class="muted small">No active streak</span>

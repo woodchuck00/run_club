@@ -1,8 +1,11 @@
 <script>
 import { api } from '../lib/api';
+import { socialMeta } from '../lib/social';
+import AlertMessage from '../components/AlertMessage.vue';
 
 export default {
   name: 'PublicProfileView',
+  components: { AlertMessage },
   data() {
     return {
       user: null,
@@ -20,6 +23,10 @@ export default {
     await this.loadProfile();
   },
   methods: {
+    capitalize(value) {
+      return value ? value.charAt(0).toUpperCase() + value.slice(1) : '';
+    },
+    socialMeta,
     async loadProfile() {
       this.loading = true;
       try {
@@ -58,7 +65,7 @@ export default {
 
     <article class="card">
       <div v-if="loading" class="loading">Loading...</div>
-      <div v-else-if="error" class="alert alert-error">{{ error }}</div>
+      <AlertMessage v-else-if="error" type="error" :message="error" />
       <div v-else-if="user" class="stack">
         <div class="row">
           <img v-if="signedAvatarUrl" :src="signedAvatarUrl" alt="Avatar" class="avatar avatar-lg" />
@@ -72,11 +79,35 @@ export default {
           <div class="stat-label">Bio</div>
           <p>{{ user.bio }}</p>
         </div>
+        <div v-if="user.age || user.sex || user.marital_status" class="stack-sm">
+          <div class="stat-label">Details</div>
+          <div v-if="user.age" class="small icon-text">
+            <i class="fa-solid fa-cake-candles" aria-hidden="true" />
+            <span>Age: {{ user.age }}</span>
+          </div>
+          <div v-if="user.sex" class="small icon-text">
+            <i class="fa-solid fa-venus-mars" aria-hidden="true" />
+            <span>Sex: {{ capitalize(user.sex) }}</span>
+          </div>
+          <div v-if="user.marital_status" class="small icon-text">
+            <i class="fa-solid fa-ring" aria-hidden="true" />
+            <span>Marital status: {{ capitalize(user.marital_status) }}</span>
+          </div>
+        </div>
         <div v-if="user.social_links && user.social_links.length" class="stack-sm">
           <div class="stat-label">Social links</div>
           <div class="stack-sm">
-            <a v-for="link in user.social_links" :key="link.platform" :href="link.url" target="_blank" rel="noopener noreferrer" class="muted">
-              {{ link.platform }}
+            <a
+              v-for="link in user.social_links"
+              :key="link.platform"
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+            >
+              <i :class="socialMeta(link.platform).icon" aria-hidden="true" />
+              <span>{{ socialMeta(link.platform).label }}</span>
+              <i class="fa-solid fa-arrow-up-right-from-square social-link-external" aria-hidden="true" />
             </a>
           </div>
         </div>

@@ -43,7 +43,10 @@ export default {
   <footer class="app-footer">
     <div class="container row-between">
       <span>{{ authStore.clubName }}</span>
-      <span>Attendance tracking · {{ year }}</span>
+      <span class="icon-text">
+        <i class="fa-solid fa-person-running" aria-hidden="true" />
+        <span>Attendance tracking · {{ year }}</span>
+      </span>
     </div>
   </footer>
 </template>

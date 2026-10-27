@@ -46,7 +46,10 @@ export default {
       <div class="stack-sm">
         <span class="badge">{{ isCancelled ? 'Cancelled' : 'Today' }}</span>
         <h2>{{ sessionTitle }}</h2>
-        <p>{{ formattedDate }}</p>
+        <p class="icon-text">
+          <i class="fa-solid fa-calendar-days" aria-hidden="true" />
+          <span>{{ formattedDate }}</span>
+        </p>
       </div>
       <div class="stack-sm" style="text-align: right">
         <span class="checkin-count">{{ session.headcount ?? 0 }}</span>
@@ -74,6 +77,7 @@ export default {
           :disabled="busy"
           @click="$emit('undo')"
         >
+          <i class="fa-solid fa-rotate-left" aria-hidden="true" />
           {{ busy ? 'Undoing…' : 'Undo check-in' }}
         </button>
         <button
@@ -83,10 +87,17 @@ export default {
           :disabled="busy"
           @click="$emit('checkin')"
         >
+          <i class="fa-solid fa-person-running" aria-hidden="true" />
           {{ busy ? 'Checking in…' : "I'm here" }}
         </button>
-        <span v-else-if="checkedIn" class="badge">Checked in</span>
-        <span v-else-if="!isCancelled" class="badge">Scheduled</span>
+        <span v-else-if="checkedIn" class="badge">
+          <i class="fa-solid fa-circle-check" aria-hidden="true" />
+          Checked in
+        </span>
+        <span v-else-if="!isCancelled" class="badge">
+          <i class="fa-solid fa-clock" aria-hidden="true" />
+          Scheduled
+        </span>
       </div>
     </div>
   </article>

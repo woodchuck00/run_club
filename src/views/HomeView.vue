@@ -125,9 +125,11 @@ export default {
           class="btn btn-secondary"
           :to="authStore.clubRoute('admin-sessions')"
         >
+          <i class="fa-solid fa-calendar-plus" aria-hidden="true" />
           Schedule a session
         </RouterLink>
         <RouterLink class="btn btn-secondary" :to="authStore.clubRoute('sessions')">
+          <i class="fa-solid fa-calendar-days" aria-hidden="true" />
           All sessions
         </RouterLink>
       </div>
@@ -171,6 +173,7 @@ export default {
             class="btn btn-secondary"
             :to="authStore.clubRoute('admin-sessions')"
           >
+            <i class="fa-solid fa-plus" aria-hidden="true" />
             Create a session
           </RouterLink>
           <RouterLink
@@ -178,6 +181,7 @@ export default {
             class="btn btn-secondary"
             :to="authStore.clubRoute('session-detail', { id: nextSession.id })"
           >
+            <i class="fa-solid fa-arrow-right" aria-hidden="true" />
             View next session
           </RouterLink>
         </div>
@@ -194,6 +198,7 @@ export default {
             class="btn btn-secondary"
             :to="authStore.clubRoute('session-detail', { id: nextSession.id })"
           >
+            <i class="fa-solid fa-arrow-right" aria-hidden="true" />
             View
           </RouterLink>
         </div>
@@ -202,7 +207,10 @@ export default {
       <section>
         <div class="section-title">
           <h2>Recent sessions</h2>
-          <RouterLink class="small" :to="authStore.clubRoute('sessions')">View all</RouterLink>
+          <RouterLink class="small icon-text" :to="authStore.clubRoute('sessions')">
+            <span>View all</span>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true" />
+          </RouterLink>
         </div>
 
         <div v-if="recentSessions.length" class="list">

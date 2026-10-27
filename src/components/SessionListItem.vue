@@ -39,13 +39,20 @@ export default {
           <span v-if="session.is_today" class="badge badge-primary">Today</span>
           <span v-if="session.status === 'cancelled'" class="badge badge-danger">Cancelled</span>
           <span v-if="session.my_attendance_id" class="badge badge-accent">You attended</span>
-          <span class="small muted">{{ formattedDate }}</span>
+          <span class="small muted icon-text">
+            <i class="fa-solid fa-calendar-days" aria-hidden="true" />
+            <span>{{ formattedDate }}</span>
+          </span>
         </div>
         <h3>{{ title }}</h3>
       </div>
       <div class="stack-sm" style="text-align: right">
         <strong>{{ session.headcount || 0 }}</strong>
-        <span class="small muted">{{ headcountLabel }}</span>
+        <span class="small muted icon-text">
+          <i class="fa-solid fa-users" aria-hidden="true" />
+          <span>{{ headcountLabel }}</span>
+        </span>
+        <i class="fa-solid fa-chevron-right session-chevron" aria-hidden="true" />
       </div>
     </div>
   </RouterLink>

@@ -22,9 +22,9 @@ export async function onRequestPost(context) {
 
   try {
     const rows = await sql`
-      INSERT INTO users (email, name, password_hash)
+      INSERT INTO users (email, display_name, password_hash)
       VALUES (${email}, ${name}, crypt(${password}, gen_salt('bf', 12)))
-      RETURNING id::text AS id, email, name, created_at
+      RETURNING id::text AS id, email, display_name AS name, created_at
     `;
 
     user = rows[0];

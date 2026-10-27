@@ -18,7 +18,11 @@ export const useAuthStore = defineStore('auth', {
       state.membership?.status === 'active'
     ),
     displayName: (state) => (
-      state.membership?.display_name || state.user?.name || ''
+      state.membership?.display_name
+      || state.user?.displayName
+      || state.user?.display_name
+      || state.user?.name
+      || ''
     ),
     avatarUrl: (state) => (
       state.membership?.avatar_url || state.user?.avatar_url || null

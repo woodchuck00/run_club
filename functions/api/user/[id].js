@@ -13,6 +13,12 @@ export async function onRequestGet(context) {
       u.bio,
       u.social_links,
       u.avatar_url,
+      CASE
+        WHEN u.birthdate_public
+        THEN EXTRACT(YEAR FROM age(u.birthdate))::int
+      END AS age,
+      CASE WHEN u.sex_public THEN u.sex END AS sex,
+      CASE WHEN u.marital_status_public THEN u.marital_status END AS marital_status,
       u.created_at
     FROM users u
     WHERE u.id = ${id}

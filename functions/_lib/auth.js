@@ -112,6 +112,12 @@ export async function getSessionUser(request, env) {
       u.bio,
       u.social_links AS "socialLinks",
       u.avatar_url AS "avatarUrl",
+      u.birthdate,
+      u.sex,
+      u.marital_status AS "maritalStatus",
+      u.birthdate_public AS "birthdatePublic",
+      u.sex_public AS "sexPublic",
+      u.marital_status_public AS "maritalStatusPublic",
       u.created_at,
       u.role
     FROM auth_sessions s

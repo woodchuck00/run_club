@@ -77,7 +77,7 @@ export async function onRequestPost(context) {
           created_at
       ), new_member AS (
         INSERT INTO members (club_id, user_id, display_name, email, role)
-        SELECT id, ${user.id}, ${user.name}, ${user.email}, 'admin'
+        SELECT id, ${user.id}, ${user.displayName}, ${user.email}, 'admin'
         FROM new_club
         RETURNING id
       )
