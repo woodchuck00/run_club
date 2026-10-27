@@ -46,7 +46,7 @@ export default {
 </script>
 
 <template>
-  <div class="container page">
+  <div class="page-shell page">
     <div class="page-header">
       <div>
         <h1>Run clubs</h1>
@@ -80,7 +80,7 @@ export default {
       <span>Loading clubs…</span>
     </div>
 
-    <div v-else-if="authStore.clubs.length" class="grid grid-3">
+    <div v-else-if="authStore.clubs.length" class="auto-grid grid-3">
       <article
         v-for="club in authStore.clubs"
         :key="club.id"

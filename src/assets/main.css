@@ -1,3 +1,4 @@
+@layer components {
 :root {
   color-scheme: light;
   --bg: #f4f7f5;
@@ -132,7 +133,7 @@ button {
   outline-offset: 2px;
 }
 
-.container {
+.page-shell {
   width: min(1080px, calc(100% - 2rem));
   margin: 0 auto;
 }
@@ -194,7 +195,7 @@ button {
   opacity: 0.8;
 }
 
-.grid {
+.auto-grid {
   display: grid;
   gap: 1rem;
 }
@@ -545,7 +546,7 @@ tbody tr:hover {
   gap: 0.6rem;
 }
 
-.list-item {
+.list-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -556,7 +557,7 @@ tbody tr:hover {
   background: var(--surface);
 }
 
-.list-item-button {
+.list-row-button {
   width: 100%;
   text-align: left;
   border: 1px solid var(--border);
@@ -570,7 +571,7 @@ tbody tr:hover {
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.list-item-button:hover {
+.list-row-button:hover {
   border-color: var(--primary);
   background: var(--primary-soft);
 }
@@ -779,6 +780,7 @@ tbody tr:hover {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
+  max-width: 16rem;
   color: var(--text);
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -892,6 +894,17 @@ tbody tr:hover {
   gap: 0.15rem;
 }
 
+.dropdown-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.3rem 0.75rem 0.5rem;
+  margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
 .dropdown-item {
   display: flex;
   align-items: center;
@@ -913,6 +926,22 @@ tbody tr:hover {
 .dropdown-item:hover {
   background: var(--surface-2);
   text-decoration: none;
+}
+
+.mobile-menu {
+  max-height: calc(100vh - 5rem);
+  max-height: calc(100dvh - 5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid var(--border);
+  margin-top: 0.35rem;
+  padding: 0.65rem 0 0.35rem;
+}
+
+.mobile-menu-divider {
+  height: 1px;
+  margin: 0.5rem 0;
+  background: var(--border);
 }
 
 .app-footer {
@@ -1230,28 +1259,12 @@ tbody tr:hover {
 }
 
 @media (max-width: 720px) {
-  .container {
+  .page-shell {
     width: min(100% - 1.25rem, 1080px);
   }
 
   .page {
     padding-top: 1.25rem;
-  }
-
-  .nav-inner {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.35rem;
-    padding: 0.65rem 0;
-  }
-
-  .nav-links {
-    width: 100%;
-  }
-
-  .nav-link {
-    padding: 0.35rem 0.55rem;
-    font-size: 0.84rem;
   }
 
   .card,
@@ -1267,4 +1280,5 @@ tbody tr:hover {
   .stat-value {
     font-size: 1.65rem;
   }
+}
 }

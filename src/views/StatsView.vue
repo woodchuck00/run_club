@@ -56,7 +56,7 @@ export default {
 </script>
 
 <template>
-  <div class="container page">
+  <div class="page-shell page">
     <div class="page-header">
       <div>
         <h1>Stats</h1>
@@ -72,7 +72,7 @@ export default {
     </div>
 
     <div v-else class="stack">
-      <div class="grid grid-3">
+      <div class="auto-grid grid-3">
         <StatCard
           label="Sessions"
           :value="totals.sessions"

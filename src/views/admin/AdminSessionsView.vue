@@ -120,7 +120,7 @@ export default {
 </script>
 
 <template>
-  <div class="container page">
+  <div class="page-shell page">
     <div class="page-header">
       <div>
         <h1>Admin sessions</h1>

@@ -105,7 +105,7 @@ export default {
 </script>
 
 <template>
-  <div class="container page">
+  <div class="page-shell page">
     <div class="page-header">
       <div>
         <h1>Club settings</h1>
@@ -123,7 +123,7 @@ export default {
       </div>
     </div>
 
-    <div v-if="club" class="grid grid-2">
+    <div v-if="club" class="auto-grid grid-2">
       <article class="card">
         <h2 style="margin-bottom: 1rem">Details</h2>
 

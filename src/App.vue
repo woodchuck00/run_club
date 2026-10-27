@@ -41,7 +41,7 @@ export default {
     <RouterView />
   </main>
   <footer class="app-footer">
-    <div class="container row-between">
+    <div class="page-shell row-between">
       <span>{{ authStore.clubName }}</span>
       <span class="icon-text">
         <i class="fa-solid fa-person-running" aria-hidden="true" />

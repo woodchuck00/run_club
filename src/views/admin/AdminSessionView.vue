@@ -169,7 +169,7 @@ export default {
 </script>
 
 <template>
-  <div class="container page">
+  <div class="page-shell page">
     <div class="row" style="margin-bottom: 1rem">
       <RouterLink
         class="small icon-text"
@@ -240,7 +240,7 @@ export default {
         message="This session is cancelled. You can still adjust attendance records."
       />
 
-      <div class="grid grid-2">
+      <div class="auto-grid grid-2">
         <article class="card">
           <div class="section-title">
             <h2>Checked in</h2>
@@ -248,7 +248,7 @@ export default {
           </div>
 
           <div v-if="attendance.length" class="list">
-            <div v-for="record in attendance" :key="record.id" class="list-item">
+            <div v-for="record in attendance" :key="record.id" class="list-row">
               <div class="row">
                 <span
                   class="avatar"
@@ -308,7 +308,7 @@ export default {
               <div
                 v-for="member in availableMembers"
                 :key="member.id"
-                class="list-item"
+                class="list-row"
               >
                 <div class="row">
                   <span class="avatar" aria-hidden="true">

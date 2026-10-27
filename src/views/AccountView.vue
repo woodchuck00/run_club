@@ -292,7 +292,7 @@ export default {
 </script>
 
 <template>
-  <div class="container page">
+  <div class="page-shell page">
     <div class="page-header">
       <div>
         <h1>Account</h1>
@@ -300,7 +300,7 @@ export default {
       </div>
     </div>
 
-    <div class="grid grid-2">
+    <div class="auto-grid grid-2">
       <article class="card">
         <div class="section-title">
         <div>
@@ -324,7 +324,7 @@ export default {
         <div
           v-for="club in authStore.myClubs"
           :key="club.id"
-          class="list-item"
+          class="list-row"
         >
           <div class="stack-sm">
             <strong>{{ club.name }}</strong>

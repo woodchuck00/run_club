@@ -58,7 +58,7 @@ export default {
 </script>
 
 <template>
-  <div class="container page">
+  <div class="page-shell page">
     <div class="page-header">
       <h1>Public Profile</h1>
     </div>

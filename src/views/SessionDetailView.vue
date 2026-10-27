@@ -100,7 +100,7 @@ export default {
 </script>
 
 <template>
-  <div class="container page">
+  <div class="page-shell page">
     <div class="row" style="margin-bottom: 1rem">
       <RouterLink class="small icon-text" :to="authStore.clubRoute('sessions')">
         <i class="fa-solid fa-arrow-left" aria-hidden="true" />
@@ -194,7 +194,7 @@ export default {
             <div
               v-for="record in attendance"
               :key="record.id"
-              class="list-item"
+              class="list-row"
             >
               <div class="row">
                 <span

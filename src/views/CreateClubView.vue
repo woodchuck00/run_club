@@ -67,7 +67,7 @@ export default {
 </script>
 
 <template>
-  <div class="container page">
+  <div class="page-shell page">
     <div class="auth-shell" style="margin-top: 0">
       <div class="auth-card">
         <h1 class="auth-title">Create a club</h1>
