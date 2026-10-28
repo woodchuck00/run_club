@@ -12,6 +12,8 @@ export async function onRequestGet(context) {
       u.display_name,
       u.bio,
       u.social_links,
+      u.interests,
+      u.music,
       u.avatar_url,
       CASE
         WHEN u.birthdate_public

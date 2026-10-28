@@ -111,6 +111,8 @@ export async function getSessionUser(request, env) {
       u.display_name AS "displayName",
       u.bio,
       u.social_links AS "socialLinks",
+      u.interests,
+       u.music,
       u.avatar_url AS "avatarUrl",
       u.birthdate,
       u.sex,

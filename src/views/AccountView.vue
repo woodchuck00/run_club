@@ -38,6 +38,10 @@ export default {
       profileBirthdatePublic: false,
       profileSexPublic: false,
       profileMaritalStatusPublic: false,
+      profileInterests: [],
+      newInterest: '',
+      profileMusic: [],
+      newMusic: '',
       sexOptions: [
         { value: 'female', label: 'Female' },
         { value: 'male', label: 'Male' },
@@ -134,6 +138,14 @@ export default {
         this.profileBirthdatePublic = Boolean(this.authStore.user.birthdatePublic);
         this.profileSexPublic = Boolean(this.authStore.user.sexPublic);
         this.profileMaritalStatusPublic = Boolean(this.authStore.user.maritalStatusPublic);
+        const rawInterests = typeof this.authStore.user?.interests === 'string'
+          ? JSON.parse(this.authStore.user.interests || '[]')
+          : (this.authStore.user?.interests || []);
+        this.profileInterests = Array.isArray(rawInterests) ? rawInterests.filter(i => typeof i === 'string') : [];
+        const rawMusic = typeof this.authStore.user?.music === 'string'
+          ? JSON.parse(this.authStore.user.music || '[]')
+          : (this.authStore.user?.music || []);
+        this.profileMusic = Array.isArray(rawMusic) ? rawMusic.filter(i => typeof i === 'string') : [];
         const rawSocial = typeof this.authStore.user?.socialLinks === 'string'
           ? JSON.parse(this.authStore.user.socialLinks || '[]')
           : (this.authStore.user?.socialLinks || []);
@@ -160,6 +172,50 @@ export default {
       }
     },
     socialMeta,
+    addInterest() {
+      const interest = (this.newInterest || '').trim();
+      if (!interest) {
+        return;
+      }
+      if (!Array.isArray(this.profileInterests)) {
+        this.profileInterests = [];
+      }
+      if (this.profileInterests.includes(interest)) {
+        this.newInterest = '';
+        return;
+      }
+      this.profileInterests.push(interest);
+      this.newInterest = '';
+    },
+    removeInterest(index) {
+      if (!Array.isArray(this.profileInterests)) {
+        this.profileInterests = [];
+        return;
+      }
+      this.profileInterests.splice(index, 1);
+    },
+    addMusic() {
+      const music = (this.newMusic || '').trim();
+      if (!music) {
+        return;
+      }
+      if (!Array.isArray(this.profileMusic)) {
+        this.profileMusic = [];
+      }
+      if (this.profileMusic.includes(music)) {
+        this.newMusic = '';
+        return;
+      }
+      this.profileMusic.push(music);
+      this.newMusic = '';
+    },
+    removeMusic(index) {
+      if (!Array.isArray(this.profileMusic)) {
+        this.profileMusic = [];
+        return;
+      }
+      this.profileMusic.splice(index, 1);
+    },
     onAvatarChange(event) {
       const file = event.target.files?.[0];
       event.target.value = '';
@@ -233,6 +289,8 @@ export default {
         if (socialLinks.length) {
           formData.append('socialLinks', JSON.stringify(socialLinks));
         }
+        formData.append('interests', JSON.stringify(Array.isArray(this.profileInterests) ? this.profileInterests : []));
+        formData.append('music', JSON.stringify(Array.isArray(this.profileMusic) ? this.profileMusic : []));
         if (this.profileAvatarFile) {
           formData.append('avatar', this.profileAvatarFile);
         }
@@ -477,6 +535,68 @@ export default {
           <div class="field">
             <label for="profile-bio">Bio</label>
             <textarea id="profile-bio" v-model="profileBio" rows="3" />
+          </div>
+
+          <div class="field">
+            <div class="row" style="align-items: center; gap: 0.5rem; margin-bottom: 0.25rem">
+              <label for="profile-interests" style="margin-bottom: 0">Interests</label>
+              <span class="muted" title="Add interests and they will appear as pill badges." aria-label="Add interests and they will appear as pill badges." style="cursor: help">
+                <i class="fa-solid fa-circle-info" aria-hidden="true" />
+              </span>
+            </div>
+            <div class="row" style="align-items: stretch; gap: 0.5rem">
+              <input
+                id="profile-interests"
+                v-model="newInterest"
+                type="text"
+                placeholder="Add an interest"
+                style="flex: 1"
+                @keyup.enter.prevent="addInterest"
+              />
+              <button class="btn btn-secondary btn-sm" type="button" @click="addInterest" style="white-space: nowrap">
+                <i class="fa-solid fa-plus" aria-hidden="true" />
+                Add
+              </button>
+            </div>
+            <div v-if="profileInterests && profileInterests.length" class="row flex-wrap" style="gap: 0.5rem; margin-top: 0.5rem">
+              <span v-for="(interest, idx) in profileInterests" :key="idx" class="badge badge-accent" style="display: inline-flex; align-items: center; gap: 0.25rem">
+                {{ interest }}
+                <button type="button" class="btn btn-ghost btn-xs" style="padding: 0 0.25rem" @click="removeInterest(idx)" aria-label="Remove interest">
+                  <i class="fa-solid fa-xmark" aria-hidden="true" />
+                </button>
+              </span>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="row" style="align-items: center; gap: 0.5rem; margin-bottom: 0.25rem">
+              <label for="profile-music" style="margin-bottom: 0">Music</label>
+              <span class="muted" title="Add music and they will appear as pill badges." aria-label="Add music and they will appear as pill badges." style="cursor: help">
+                <i class="fa-solid fa-circle-info" aria-hidden="true" />
+              </span>
+            </div>
+            <div class="row" style="align-items: stretch; gap: 0.5rem">
+              <input
+                id="profile-music"
+                v-model="newMusic"
+                type="text"
+                placeholder="Add a music"
+                style="flex: 1"
+                @keyup.enter.prevent="addMusic"
+              />
+              <button class="btn btn-secondary btn-sm" type="button" @click="addMusic" style="white-space: nowrap">
+                <i class="fa-solid fa-plus" aria-hidden="true" />
+                Add
+              </button>
+            </div>
+            <div v-if="profileMusic && profileMusic.length" class="row flex-wrap" style="gap: 0.5rem; margin-top: 0.5rem">
+              <span v-for="(music, idx) in profileMusic" :key="idx" class="badge badge-accent" style="display: inline-flex; align-items: center; gap: 0.25rem">
+                {{ music }}
+                <button type="button" class="btn btn-ghost btn-xs" style="padding: 0 0.25rem" @click="removeMusic(idx)" aria-label="Remove music">
+                  <i class="fa-solid fa-xmark" aria-hidden="true" />
+                </button>
+              </span>
+            </div>
           </div>
 
           <div class="field">

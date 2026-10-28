@@ -83,6 +83,8 @@ export async function onRequestPost(context) {
   const formData = await request.formData();
   const bio = formData.get('bio') ?? null;
   const socialLinks = formData.get('socialLinks') ?? null;
+  const interests = formData.get('interests') ?? null;
+  const music = formData.get('music') ?? null;
   const displayName = asName(formData.get('displayName')) ?? null;
   const email = formData.get('email') || null;
   const birthdate = asOptionalBirthdate(formData.get('birthdate'));
@@ -118,6 +120,8 @@ export async function onRequestPost(context) {
     UPDATE users
     SET bio = ${bio},
         social_links = ${socialLinks},
+        interests = ${interests},
+        music = ${music},
         display_name = ${displayName},
         email = ${email},
         avatar_url = ${avatarUrl},
@@ -130,6 +134,8 @@ export async function onRequestPost(context) {
     WHERE id = ${user.id}
     RETURNING id::text AS id, email, display_name, bio,
               social_links AS socialLinks,
+              interests,
+              music,
               avatar_url AS avatarUrl,
               display_name AS displayName,
               birthdate, sex,
@@ -141,4 +147,4 @@ export async function onRequestPost(context) {
   `;
 
   return json({ user: rows[0] });
-}   
+}

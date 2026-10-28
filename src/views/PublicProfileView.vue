@@ -32,6 +32,17 @@ export default {
       try {
         const res = await api(`/user/${this.userId}`);
         this.user = res.user;
+        if (this.user) {
+          if (typeof this.user.social_links === 'string') {
+            try { this.user.social_links = JSON.parse(this.user.social_links || '[]'); } catch { this.user.social_links = []; }
+          }
+          if (typeof this.user.interests === 'string') {
+            try { this.user.interests = JSON.parse(this.user.interests || '[]'); } catch { this.user.interests = []; }
+          }
+          if (typeof this.user.music === 'string') {
+            try { this.user.music = JSON.parse(this.user.music || '[]'); } catch { this.user.music = []; }
+          }
+        }
         if (this.user?.avatar_url) {
           await this.loadSignedAvatar();
         }
@@ -67,17 +78,17 @@ export default {
       <div v-if="loading" class="loading">Loading...</div>
       <AlertMessage v-else-if="error" type="error" :message="error" />
       <div v-else-if="user" class="stack">
-        <div class="row">
+        <div class="row" style="align-items: center">
           <img v-if="signedAvatarUrl" :src="signedAvatarUrl" alt="Avatar" class="avatar avatar-lg" />
           <img v-else-if="user.avatar_url" :src="user.avatar_url" alt="Avatar" class="avatar avatar-lg" />
           <span v-else class="avatar avatar-lg" aria-hidden="true">{{ user.display_name?.charAt(0) || user.name?.charAt(0) || '?' }}</span>
           <div class="stack-sm">
-            <h2>{{ user.display_name || user.name }}</h2>
+            <h2 style="margin: 0">{{ user.display_name || user.name }}</h2>
           </div>
         </div>
         <div v-if="user.bio" class="stack-sm">
           <div class="stat-label">Bio</div>
-          <p>{{ user.bio }}</p>
+          <p style="white-space: pre-wrap">{{ user.bio }}</p>
         </div>
         <div v-if="user.age || user.sex || user.marital_status" class="stack-sm">
           <div class="stat-label">Details</div>
@@ -92,6 +103,18 @@ export default {
           <div v-if="user.marital_status" class="small icon-text">
             <i class="fa-solid fa-ring" aria-hidden="true" />
             <span>Marital status: {{ capitalize(user.marital_status) }}</span>
+          </div>
+        </div>
+        <div v-if="user.interests && user.interests.length" class="stack-sm">
+          <div class="stat-label">Interests</div>
+          <div class="row flex-wrap" style="gap: 0.5rem">
+            <span v-for="(interest, idx) in user.interests" :key="idx" class="badge badge-accent">{{ interest }}</span>
+          </div>
+        </div>
+        <div v-if="user.music && user.music.length" class="stack-sm">
+          <div class="stat-label">Music</div>
+          <div class="row flex-wrap" style="gap: 0.5rem">
+            <span v-for="(track, idx) in user.music" :key="idx" class="badge badge-accent">{{ track }}</span>
           </div>
         </div>
         <div v-if="user.social_links && user.social_links.length" class="stack-sm">

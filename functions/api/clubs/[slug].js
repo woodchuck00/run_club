@@ -69,12 +69,28 @@ export async function onRequestPatch(context) {
   const timezone = body.timezone === undefined
     ? club.timezone
     : asTimezone(body.timezone);
+  const imageUrl = body.imageUrl === undefined ? (club.imageUrl || null) : (body.imageUrl || null);
+  const mapImageUrl = body.mapImageUrl === undefined ? (club.mapImageUrl || null) : (body.mapImageUrl || null);
+  const waiver = body.waiver === undefined ? (club.waiver || null) : body.waiver;
+  const zipCode = body.zipCode === undefined ? (club.zipCode || body.zip_code || null) : (body.zipCode || body.zip_code || null);
+  let socialLinks = body.socialLinks === undefined ? (club.socialLinks || null) : (body.socialLinks || body.social_links || null);
+  if (typeof socialLinks === 'string') {
+    try { socialLinks = JSON.parse(socialLinks); } catch { /* ignore */ }
+  }
+  if (socialLinks && typeof socialLinks === 'object') {
+    try { socialLinks = JSON.stringify(socialLinks); } catch { socialLinks = null; }
+  }
   const sql = getSql(env);
   const rows = await sql`
     UPDATE clubs
     SET name = ${name},
         description = ${description},
-        timezone = ${timezone}
+        timezone = ${timezone},
+        image_url = ${imageUrl},
+        social_links = ${socialLinks},
+        map_image_url = ${mapImageUrl},
+        waiver = ${waiver},
+        zip_code = ${zipCode}
     WHERE id = ${club.id}
     RETURNING
       id::text AS id,
@@ -82,6 +98,11 @@ export async function onRequestPatch(context) {
       slug,
       description,
       timezone,
+      image_url AS "imageUrl",
+      social_links AS "socialLinks",
+      map_image_url AS "mapImageUrl",
+      waiver,
+      zip_code AS "zipCode",
       created_at
   `;
 

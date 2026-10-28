@@ -15,6 +15,11 @@ export async function getClubBySlug(env, slug) {
       slug,
       description,
       timezone,
+      image_url AS "imageUrl",
+      social_links AS "socialLinks",
+      map_image_url AS "mapImageUrl",
+      waiver,
+      zip_code AS "zipCode",
       created_at
     FROM clubs
     WHERE lower(slug) = lower(${slug})

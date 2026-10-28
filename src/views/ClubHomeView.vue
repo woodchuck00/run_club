@@ -8,7 +8,7 @@ import CheckInCard from '../components/CheckInCard.vue';
 import SessionListItem from '../components/SessionListItem.vue';
 
 export default {
-  name: 'HomeView',
+  name: 'ClubHomeView',
   components: { AlertMessage, CheckInCard, SessionListItem },
   data() {
     return {

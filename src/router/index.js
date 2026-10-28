@@ -3,7 +3,7 @@ import { useAuthStore } from '../stores/auth';
 import ClubsView from '../views/ClubsView.vue';
 import CreateClubView from '../views/CreateClubView.vue';
 import JoinClubView from '../views/JoinClubView.vue';
-import HomeView from '../views/HomeView.vue';
+import ClubHomeView from '../views/ClubHomeView.vue';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import SessionsView from '../views/SessionsView.vue';
@@ -58,7 +58,7 @@ const routes = [
   {
     path: '/c/:clubSlug',
     name: 'home',
-    component: HomeView,
+    component: ClubHomeView,
     meta: {
       requiresAuth: true,
       club: true,

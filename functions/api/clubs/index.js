@@ -18,6 +18,11 @@ export async function onRequestGet({ env, data }) {
       c.slug,
       c.description,
       c.timezone,
+      c.image_url AS "imageUrl",
+      c.social_links AS "socialLinks",
+      c.map_image_url AS "mapImageUrl",
+      c.waiver,
+      c.zip_code AS "zipCode",
       c.created_at,
       (
         SELECT COUNT(*)::int
@@ -59,6 +64,17 @@ export async function onRequestPost(context) {
   const slug = asSlug(body.slug);
   const timezone = asTimezone(body.timezone || 'UTC');
   const description = asOptionalDescription(body.description);
+  const imageUrl = body.imageUrl || body.image_url || null;
+  const mapImageUrl = body.mapImageUrl || body.map_image_url || null;
+  const waiver = body.waiver === undefined ? null : body.waiver;
+  const zipCode = body.zipCode || body.zip_code || null;
+  let socialLinks = body.socialLinks || body.social_links || null;
+  if (typeof socialLinks === 'string') {
+    try { socialLinks = JSON.parse(socialLinks); } catch { socialLinks = null; }
+  }
+  if (socialLinks && typeof socialLinks === 'object') {
+    socialLinks = JSON.stringify(socialLinks);
+  }
   const sql = getSql(env);
 
   let club;
@@ -66,8 +82,8 @@ export async function onRequestPost(context) {
   try {
     const rows = await sql`
       WITH new_club AS (
-        INSERT INTO clubs (name, slug, description, timezone, created_by)
-        VALUES (${name}, ${slug}, ${description}, ${timezone}, ${user.id})
+        INSERT INTO clubs (name, slug, description, timezone, image_url, social_links, map_image_url, waiver, zip_code, created_by)
+        VALUES (${name}, ${slug}, ${description}, ${timezone}, ${imageUrl}, ${socialLinks}, ${mapImageUrl}, ${waiver}, ${zipCode}, ${user.id})
         RETURNING
           id,
           name,
@@ -87,6 +103,11 @@ export async function onRequestPost(context) {
         c.slug,
         c.description,
         c.timezone,
+        c.image_url AS "imageUrl",
+        c.social_links AS "socialLinks",
+        c.map_image_url AS "mapImageUrl",
+        c.waiver,
+        c.zip_code AS "zipCode",
         c.created_at,
         'admin' AS role,
         TRUE AS joined
