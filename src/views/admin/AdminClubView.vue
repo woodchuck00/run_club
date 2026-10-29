@@ -3,18 +3,46 @@ import QRCode from 'qrcode';
 import { mapStores } from 'pinia';
 import { useAuthStore } from '../../stores/auth';
 import AlertMessage from '../../components/AlertMessage.vue';
+import SearchableSelect from '../../components/SearchableSelect.vue';
+import { signB2Url } from '../../lib/b2';
+
+const TIMEZONE_OPTIONS = [
+  'UTC',
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Los_Angeles',
+  'America/Phoenix',
+  'America/Anchorage',
+  'Pacific/Honolulu',
+  'Europe/London',
+  'Europe/Paris',
+  'Europe/Berlin',
+  'Europe/Madrid',
+  'Europe/Rome',
+  'Asia/Tokyo',
+  'Asia/Shanghai',
+  'Asia/Kolkata',
+  'Australia/Sydney',
+  'Australia/Melbourne',
+];
 
 export default {
   name: 'AdminClubView',
-  components: { AlertMessage },
+  components: { AlertMessage, SearchableSelect },
   data() {
     return {
       name: '',
       timezone: '',
+      timezoneOptions: TIMEZONE_OPTIONS,
       description: '',
       imageUrl: '',
+      clubImageFile: null,
+      clubImagePreview: '',
       socialLinks: [],
       mapImageUrl: '',
+      mapImageFile: null,
+      mapImagePreview: '',
       waiver: '',
       zipCode: '',
       newSocialUrl: '',
@@ -50,6 +78,11 @@ export default {
           this.description = club.description || '';
           this.imageUrl = club.imageUrl || club.image_url || '';
           this.mapImageUrl = club.mapImageUrl || club.map_image_url || '';
+          this.clubImageFile = null;
+          this.mapImageFile = null;
+          this.setClubImagePreview('');
+          this.setMapImagePreview('');
+          this.refreshImagePreviews();
           this.waiver = club.waiver || '';
           this.zipCode = club.zipCode || club.zip_code || '';
           const sl = club.socialLinks || club.social_links || [];
@@ -66,7 +99,94 @@ export default {
     },
     joinUrl: 'generateQr',
   },
+  beforeUnmount() {
+    this.releasePreview('clubImagePreview');
+    this.releasePreview('mapImagePreview');
+  },
   methods: {
+    releasePreview(key) {
+      const value = this[key];
+      if (typeof value === 'string' && value.startsWith('blob:')) {
+        URL.revokeObjectURL(value);
+      }
+    },
+    setClubImagePreview(url) {
+      this.releasePreview('clubImagePreview');
+      this.clubImagePreview = url || '';
+    },
+    setMapImagePreview(url) {
+      this.releasePreview('mapImagePreview');
+      this.mapImagePreview = url || '';
+    },
+    async refreshImagePreviews() {
+      const imageSource = this.imageUrl;
+      const mapSource = this.mapImageUrl;
+
+      const [clubImageUrl, mapImageUrl] = await Promise.all([
+        signB2Url(imageSource),
+        signB2Url(mapSource),
+      ]);
+
+      if (!this.clubImageFile && this.imageUrl === imageSource) {
+        this.setClubImagePreview(clubImageUrl);
+      }
+
+      if (!this.mapImageFile && this.mapImageUrl === mapSource) {
+        this.setMapImagePreview(mapImageUrl);
+      }
+    },
+    validateImageFile(file, label) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        this.error = `${label} must be a JPEG, PNG, GIF, or WebP image`;
+        return false;
+      }
+
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        this.error = `${label} must be at most 5MB`;
+        return false;
+      }
+
+      this.error = '';
+      return true;
+    },
+    onClubImageChange(event) {
+      const file = event.target.files?.[0];
+      event.target.value = '';
+
+      if (!file || !this.validateImageFile(file, 'Club image')) {
+        return;
+      }
+
+      this.clubImageFile = file;
+      this.setClubImagePreview(URL.createObjectURL(file));
+      this.success = '';
+    },
+    removeClubImage() {
+      this.clubImageFile = null;
+      this.imageUrl = '';
+      this.setClubImagePreview('');
+      this.success = '';
+    },
+    onMapImageChange(event) {
+      const file = event.target.files?.[0];
+      event.target.value = '';
+
+      if (!file || !this.validateImageFile(file, 'Map image')) {
+        return;
+      }
+
+      this.mapImageFile = file;
+      this.setMapImagePreview(URL.createObjectURL(file));
+      this.success = '';
+    },
+    removeMapImage() {
+      this.mapImageFile = null;
+      this.mapImageUrl = '';
+      this.setMapImagePreview('');
+      this.success = '';
+    },
     addClubSocial() {
       if (!Array.isArray(this.socialLinks)) { this.socialLinks = []; }
       if (!this.newSocialUrl) { return; }
@@ -121,17 +241,27 @@ export default {
       this.saving = true;
 
       try {
-        const payload = {
-          name: this.name.trim(),
-          timezone: this.timezone.trim(),
-          description: this.description.trim(),
-          imageUrl: this.imageUrl || null,
-          mapImageUrl: this.mapImageUrl || null,
-          waiver: this.waiver || null,
-          zipCode: this.zipCode || null,
-          socialLinks: Array.isArray(this.socialLinks) ? this.socialLinks : [],
-        };
-        await this.authStore.updateClub(payload);
+        const formData = new FormData();
+        formData.append('name', this.name.trim());
+        formData.append('timezone', this.timezone.trim());
+        formData.append('description', this.description.trim());
+        formData.append('imageUrl', this.imageUrl || '');
+        formData.append('mapImageUrl', this.mapImageUrl || '');
+        formData.append('waiver', this.waiver || '');
+        formData.append('zipCode', this.zipCode || '');
+        formData.append(
+          'socialLinks',
+          JSON.stringify(Array.isArray(this.socialLinks) ? this.socialLinks : []),
+        );
+
+        if (this.clubImageFile) {
+          formData.append('image', this.clubImageFile);
+        }
+        if (this.mapImageFile) {
+          formData.append('mapImage', this.mapImageFile);
+        }
+
+        await this.authStore.updateClub(formData);
         this.success = 'Club settings updated.';
       } catch (error) {
         this.error = error.message;
@@ -175,28 +305,15 @@ export default {
             <input id="club-name" v-model="name" type="text" maxlength="80" required />
           </div>
 
-                    <div class="field">
+          <div class="field">
             <label for="club-timezone">Timezone</label>
-            <select id="club-timezone" v-model="timezone" required>
-              <option value="UTC">UTC</option>
-              <option value="America/New_York">America/New_York</option>
-              <option value="America/Chicago">America/Chicago</option>
-              <option value="America/Denver">America/Denver</option>
-              <option value="America/Los_Angeles">America/Los_Angeles</option>
-              <option value="America/Phoenix">America/Phoenix</option>
-              <option value="America/Anchorage">America/Anchorage</option>
-              <option value="Pacific/Honolulu">Pacific/Honolulu</option>
-              <option value="Europe/London">Europe/London</option>
-              <option value="Europe/Paris">Europe/Paris</option>
-              <option value="Europe/Berlin">Europe/Berlin</option>
-              <option value="Europe/Madrid">Europe/Madrid</option>
-              <option value="Europe/Rome">Europe/Rome</option>
-              <option value="Asia/Tokyo">Asia/Tokyo</option>
-              <option value="Asia/Shanghai">Asia/Shanghai</option>
-              <option value="Asia/Kolkata">Asia/Kolkata</option>
-              <option value="Australia/Sydney">Australia/Sydney</option>
-              <option value="Australia/Melbourne">Australia/Melbourne</option>
-            </select>
+            <SearchableSelect
+              id="club-timezone"
+              v-model="timezone"
+              :options="timezoneOptions"
+              placeholder="Search timezones…"
+              required
+            />
           </div>
 
           <div class="field">
@@ -210,13 +327,73 @@ export default {
           </div>
 
           <div class="field">
-            <label for="club-image-url">Club image URL</label>
-            <input id="club-image-url" v-model="imageUrl" type="text" />
+            <label for="club-image-input">Club image</label>
+            <div class="row" style="align-items: flex-start; gap: 1rem">
+              <img
+                v-if="clubImagePreview"
+                :src="clubImagePreview"
+                alt="Club image preview"
+                style="width: 160px; height: 100px; object-fit: cover; border-radius: 12px"
+              />
+              <div class="stack-sm">
+                <label class="btn btn-secondary btn-sm" for="club-image-input">
+                  <i class="fa-solid fa-image" aria-hidden="true" />
+                  Choose image
+                </label>
+                <input
+                  id="club-image-input"
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.gif,.webp"
+                  style="display: none"
+                  @change="onClubImageChange"
+                />
+                <button
+                  v-if="clubImagePreview"
+                  class="btn btn-sm btn-danger"
+                  type="button"
+                  @click="removeClubImage"
+                >
+                  <i class="fa-solid fa-trash" aria-hidden="true" />
+                  Remove
+                </button>
+              </div>
+            </div>
+            <span class="hint">Max size: 5MB. Allowed: JPG, PNG, GIF, WebP.</span>
           </div>
 
           <div class="field">
-            <label for="club-map-image-url">Map image URL</label>
-            <input id="club-map-image-url" v-model="mapImageUrl" type="text" />
+            <label for="club-map-image-input">Map image</label>
+            <div class="row" style="align-items: flex-start; gap: 1rem">
+              <img
+                v-if="mapImagePreview"
+                :src="mapImagePreview"
+                alt="Map image preview"
+                style="width: 160px; height: 100px; object-fit: cover; border-radius: 12px"
+              />
+              <div class="stack-sm">
+                <label class="btn btn-secondary btn-sm" for="club-map-image-input">
+                  <i class="fa-solid fa-map" aria-hidden="true" />
+                  Choose image
+                </label>
+                <input
+                  id="club-map-image-input"
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.gif,.webp"
+                  style="display: none"
+                  @change="onMapImageChange"
+                />
+                <button
+                  v-if="mapImagePreview"
+                  class="btn btn-sm btn-danger"
+                  type="button"
+                  @click="removeMapImage"
+                >
+                  <i class="fa-solid fa-trash" aria-hidden="true" />
+                  Remove
+                </button>
+              </div>
+            </div>
+            <span class="hint">Max size: 5MB. Allowed: JPG, PNG, GIF, WebP.</span>
           </div>
 
           <div class="field">

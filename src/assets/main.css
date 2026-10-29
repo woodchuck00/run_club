@@ -25,28 +25,26 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #0f1713;
-    --surface: #16211b;
-    --surface-2: #1d2b24;
-    --surface-3: #27382f;
-    --text: #e8f1eb;
-    --muted: #9fb2a6;
-    --border: #2c3f34;
-    --primary: #5ecb92;
-    --primary-dark: #8ee0b4;
-    --primary-soft: #1c3a2a;
-    --accent: #f0a35e;
-    --accent-soft: #3a2a1a;
-    --danger: #f08a80;
-    --danger-soft: #3d1f1c;
-    --warning: #f0b16a;
-    --warning-soft: #3a2b19;
-    --shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1713;
+  --surface: #16211b;
+  --surface-2: #1d2b24;
+  --surface-3: #27382f;
+  --text: #e8f1eb;
+  --muted: #9fb2a6;
+  --border: #2c3f34;
+  --primary: #5ecb92;
+  --primary-dark: #8ee0b4;
+  --primary-soft: #1c3a2a;
+  --accent: #f0a35e;
+  --accent-soft: #3a2a1a;
+  --danger: #f08a80;
+  --danger-soft: #3d1f1c;
+  --warning: #f0b16a;
+  --warning-soft: #3a2b19;
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 *,
@@ -266,10 +264,8 @@ button {
   white-space: nowrap;
 }
 
-@media (prefers-color-scheme: dark) {
-  .btn {
-    color: #0b1710;
-  }
+:root[data-theme="dark"] .btn:not(.btn-secondary):not(.btn-ghost):not(.btn-danger):not(.btn-danger-soft) {
+  color: #0b1710;
 }
 
 .btn:hover {
@@ -298,6 +294,17 @@ button {
   border-color: var(--primary);
 }
 
+:root[data-theme="dark"] .btn-secondary {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+:root[data-theme="dark"] .btn-secondary:hover {
+  background: var(--surface-3);
+  border-color: var(--primary);
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--primary);
@@ -313,10 +320,8 @@ button {
   color: #fff;
 }
 
-@media (prefers-color-scheme: dark) {
-  .btn-danger {
-    color: #1b0b09;
-  }
+:root[data-theme="dark"] .btn-danger {
+  color: #1b0b09;
 }
 
 .btn-danger:hover {
@@ -371,6 +376,7 @@ textarea {
   padding: 0.66rem 0.8rem;
   font-size: 0.96rem;
   min-height: 2.75rem;
+  color: var(--text);
 }
 
 input::placeholder,
@@ -803,10 +809,8 @@ tbody tr:hover {
   font-size: 0.95rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .brand-mark {
-    color: #0b1710;
-  }
+:root[data-theme="dark"] .brand-mark {
+  color: #0b1710;
 }
 
 .nav-links {
@@ -1005,10 +1009,8 @@ tbody tr:hover {
   border: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .checkin-card {
-    color: #0b1710;
-  }
+:root[data-theme="dark"] .checkin-card {
+  color: #0b1710;
 }
 
 .checkin-card::after {
@@ -1027,11 +1029,9 @@ tbody tr:hover {
   color: rgba(255, 255, 255, 0.78);
 }
 
-@media (prefers-color-scheme: dark) {
-  .checkin-card .muted,
-  .checkin-card .hint {
-    color: rgba(11, 23, 16, 0.7);
-  }
+:root[data-theme="dark"] .checkin-card .muted,
+:root[data-theme="dark"] .checkin-card .hint {
+  color: rgba(11, 23, 16, 0.7);
 }
 
 .checkin-card .btn {
@@ -1053,11 +1053,9 @@ tbody tr:hover {
   background: rgba(255, 255, 255, 0.14);
 }
 
-@media (prefers-color-scheme: dark) {
-  .checkin-card .btn-ghost {
-    color: #0b1710;
-    border-color: rgba(11, 23, 16, 0.35);
-  }
+:root[data-theme="dark"] .checkin-card .btn-ghost {
+  color: #0b1710;
+  border-color: rgba(11, 23, 16, 0.35);
 }
 
 .checkin-count {
@@ -1168,6 +1166,10 @@ tbody tr:hover {
 .icon-button:hover {
   background: var(--surface-2);
   color: var(--text);
+}
+
+.theme-toggle {
+  flex: 0 0 auto;
 }
 
 .search {

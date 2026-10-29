@@ -1,5 +1,6 @@
 import { HttpError, json } from '../../_lib/http.js';
 import { getSql } from '../../_lib/db.js';
+import { uploadFileToB2 } from '../../_lib/b2.js';
 import { asName, asOptionalBirthdate, asOptionalEnum } from '../../_lib/validate.js';
 import { requireUser } from '../../_lib/auth.js';
 
@@ -17,57 +18,12 @@ function asBoolean(value) {
   return value === 'true' || value === 'on' || value === '1';
 }
 
-async function uploadToB2(file, filename, env) {
-  const { B2_KEY_ID, B2_APPLICATION_KEY, B2_BUCKET, B2_BUCKET_ID } = env;
-
-  if (!B2_KEY_ID || !B2_APPLICATION_KEY || !B2_BUCKET || !B2_BUCKET_ID) {
-    throw new HttpError(500, 'B2 storage not configured. Check env vars.');
+async function uploadAvatar(file, filename, env) {
+  try {
+    return await uploadFileToB2(file, `avatars/${filename}`, env);
+  } catch (error) {
+    throw new HttpError(500, error.message);
   }
-
-  // 1. Authorize to get token + API URLs
-  const authHeader = `Basic ${btoa(`${B2_KEY_ID}:${B2_APPLICATION_KEY}`)}`;
-  const authRes = await fetch('https://api.backblazeb2.com/b2api/v2/b2_authorize_account', {
-    headers: { Authorization: authHeader },
-  });
-  if (!authRes.ok) {
-    throw new HttpError(500, `B2 authorize failed: ${authRes.statusText}`);
-  }
-  const { apiUrl, downloadUrl, authorizationToken } = await authRes.json();
-
-  // 2. Get upload URL (pass bucketId in JSON body)
-  const uploadUrlRes = await fetch(`${apiUrl}/b2api/v2/b2_get_upload_url`, {
-    method: 'POST',
-    headers: {
-      Authorization: authorizationToken,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ bucketId: B2_BUCKET_ID }),
-  });
-  if (!uploadUrlRes.ok) {
-    throw new HttpError(500, `Failed to get B2 upload URL: ${uploadUrlRes.statusText}`);
-  }
-  const { uploadUrl, authorizationToken: uploadToken } = await uploadUrlRes.json();
-
-  // 3. Upload the file
-  const key = `avatars/${filename}`;
-  const uploadRes = await fetch(uploadUrl, {
-    method: 'POST',
-    headers: {
-      Authorization: uploadToken,
-      'X-Bz-File-Name': key,
-      'Content-Type': file.type || 'application/octet-stream',
-      'X-Bz-Content-Sha1': 'do_not_verify',
-    },
-    body: await file.arrayBuffer(),
-  });
-  if (!uploadRes.ok) {
-    const errBody = await uploadRes.text();
-    console.log('B2 upload failed:', uploadRes.status, errBody);
-    throw new HttpError(500, `B2 upload failed: ${uploadRes.status} ${errBody}`);
-  }
-
-  // 4. Return the public file URL
-  return `${downloadUrl}/file/${B2_BUCKET}/${key}`;
 }
 
 export async function onRequestPost(context) {
@@ -111,7 +67,7 @@ export async function onRequestPost(context) {
       }
       const ext = avatarFile.name.split('.').pop();
       const filename = `${crypto.randomUUID()}.${ext}`;
-      avatarUrl = await uploadToB2(avatarFile, filename, env);
+      avatarUrl = await uploadAvatar(avatarFile, filename, env);
     }
   }
 

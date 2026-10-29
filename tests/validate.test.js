@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   asDate,
   asEmail,
+  asFinishTimeSeconds,
   asId,
   asName,
   asOptionalBirthdate,
@@ -59,6 +60,16 @@ describe('validation helpers', () => {
     expect(parseLimit('25')).toBe(25);
     expect(parseLimit('999', 100, 200)).toBe(999);
     expect(parseLimit('nope', 50)).toBe(50);
+  });
+
+  it('parses finish times from strings and seconds', () => {
+    expect(asFinishTimeSeconds('25:30')).toBe(1530);
+    expect(asFinishTimeSeconds('1:02:15')).toBe(3735);
+    expect(asFinishTimeSeconds(1530)).toBe(1530);
+    expect(asFinishTimeSeconds('')).toBeNull();
+    expect(() => asFinishTimeSeconds('25')).toThrow('MM:SS');
+    expect(() => asFinishTimeSeconds('12:75')).toThrow('below 60');
+    expect(() => asFinishTimeSeconds('0:00')).toThrow('greater than zero');
   });
 
   it('validates optional birthdates and enum values', () => {

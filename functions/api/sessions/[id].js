@@ -4,6 +4,7 @@ import { requireAdmin, requireClub, requireMembership } from '../../_lib/clubs.j
 import {
   asEnum,
   asId,
+  asOptionalText,
   asOptionalTitle,
 } from '../../_lib/validate.js';
 
@@ -19,6 +20,9 @@ export async function onRequestGet(context) {
       s.id::text AS id,
       s.session_date::text AS session_date,
       s.title,
+      s.description,
+      s.address,
+      s.distance,
       s.status,
       s.created_at,
       s.created_by::text AS created_by,
@@ -43,6 +47,7 @@ export async function onRequestGet(context) {
       a.member_id::text AS member_id,
       a.guest_name,
       a.source,
+      a.finish_time_seconds,
       a.created_at,
       m.display_name,
       m.status AS member_status
@@ -60,6 +65,7 @@ export async function onRequestGet(context) {
   session.member_count = attendance.filter((row) => row.member_id).length;
   session.guest_count = attendance.filter((row) => row.guest_name).length;
   session.my_attendance_id = mine?.id || null;
+  session.my_finish_time_seconds = mine?.finish_time_seconds ?? null;
   session.can_check_in = Boolean(
     session.is_today &&
     session.status === 'scheduled' &&
@@ -86,6 +92,9 @@ export async function onRequestPatch(context) {
     SELECT
       id::text AS id,
       title,
+      description,
+      address,
+      distance,
       status
     FROM sessions
     WHERE id = ${id}
@@ -102,6 +111,15 @@ export async function onRequestPatch(context) {
   const title = body.title === undefined
     ? current.title
     : asOptionalTitle(body.title);
+  const description = body.description === undefined
+    ? current.description
+    : asOptionalText(body.description, 500, 'Description');
+  const address = body.address === undefined
+    ? current.address
+    : asOptionalText(body.address, 200, 'Address');
+  const distance = body.distance === undefined
+    ? current.distance
+    : asOptionalText(body.distance, 60, 'Distance');
   const status = body.status === undefined
     ? current.status
     : asEnum(body.status, 'Status', ['scheduled', 'cancelled']);
@@ -109,6 +127,9 @@ export async function onRequestPatch(context) {
   const updatedRows = await sql`
     UPDATE sessions
     SET title = ${title},
+        description = ${description},
+        address = ${address},
+        distance = ${distance},
         status = ${status}
     WHERE id = ${id}
       AND club_id = ${club.id}
@@ -116,6 +137,9 @@ export async function onRequestPatch(context) {
       id::text AS id,
       session_date::text AS session_date,
       title,
+      description,
+      address,
+      distance,
       status,
       created_at
   `;

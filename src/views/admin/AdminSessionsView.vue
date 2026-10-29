@@ -19,6 +19,9 @@ export default {
       form: {
         sessionDate: '',
         title: '',
+        description: '',
+        address: '',
+        distance: '',
       },
     };
   },
@@ -59,6 +62,9 @@ export default {
           body: {
             sessionDate: this.form.sessionDate,
             title: this.form.title,
+            description: this.form.description,
+            address: this.form.address,
+            distance: this.form.distance,
           },
         });
         this.$router.push(
@@ -166,6 +172,39 @@ export default {
           />
         </div>
 
+        <div class="field">
+          <label for="session-address">Address (optional)</label>
+          <input
+            id="session-address"
+            v-model="form.address"
+            type="text"
+            maxlength="200"
+            placeholder="123 Main St, City"
+          />
+        </div>
+
+        <div class="field">
+          <label for="session-distance">Distance (optional)</label>
+          <input
+            id="session-distance"
+            v-model="form.distance"
+            type="text"
+            maxlength="60"
+            placeholder="5K, 3 miles"
+          />
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1">
+          <label for="session-description">Description (optional)</label>
+          <textarea
+            id="session-description"
+            v-model="form.description"
+            maxlength="500"
+            rows="3"
+            placeholder="Route details, pace groups, what to bring…"
+          />
+        </div>
+
         <div class="field" style="align-self: end">
           <button class="btn" type="submit" :disabled="submitting">
             <i class="fa-solid fa-calendar-plus" aria-hidden="true" />
@@ -199,7 +238,24 @@ export default {
                 <span v-if="session.is_today" class="badge badge-primary">Today</span>
               </div>
             </td>
-            <td>{{ session.title || 'Run club session' }}</td>
+            <td>
+              <div class="stack-sm">
+                <strong>{{ session.title || 'Run club session' }}</strong>
+                <p v-if="session.description" class="small muted session-description">
+                  {{ session.description }}
+                </p>
+                <div v-if="session.address || session.distance" class="row small muted">
+                  <span v-if="session.distance" class="icon-text">
+                    <i class="fa-solid fa-route" aria-hidden="true" />
+                    <span>{{ session.distance }}</span>
+                  </span>
+                  <span v-if="session.address" class="icon-text">
+                    <i class="fa-solid fa-location-dot" aria-hidden="true" />
+                    <span>{{ session.address }}</span>
+                  </span>
+                </div>
+              </div>
+            </td>
             <td>
               <span
                 class="badge"
@@ -252,3 +308,10 @@ export default {
     </div>
   </div>
 </template>
+
+<style scoped>
+.session-description {
+  max-width: 34rem;
+  white-space: pre-line;
+}
+</style>

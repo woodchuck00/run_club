@@ -1,7 +1,7 @@
-import { HttpError, json } from '../../../_lib/http.js';
+import { HttpError, json, readJson } from '../../../_lib/http.js';
 import { getSql } from '../../../_lib/db.js';
 import { requireClub, requireMembership } from '../../../_lib/clubs.js';
-import { asId } from '../../../_lib/validate.js';
+import { asFinishTimeSeconds, asId } from '../../../_lib/validate.js';
 
 async function getCheckInSession(env, club, id) {
   const sql = getSql(env);
@@ -63,6 +63,54 @@ export async function onRequestPost(context) {
   `;
 
   return json({ attendance_id: existing[0]?.id || null, already: true });
+}
+
+export async function onRequestPatch(context) {
+  const membership = requireMembership(context);
+  const club = requireClub(context);
+  const { request, env, params } = context;
+  const id = asId(params.id, 'Session ID');
+  const body = await readJson(request);
+  const seconds = asFinishTimeSeconds(body.seconds ?? body.finishTime);
+
+  if (seconds === null) {
+    throw new HttpError(400, 'Finish time is required');
+  }
+
+  if (membership.status !== 'active') {
+    throw new HttpError(403, 'Archived members cannot submit a time');
+  }
+
+  const session = await getCheckInSession(env, club, id);
+
+  if (!session) {
+    throw new HttpError(404, 'Session not found');
+  }
+
+  if (session.status !== 'scheduled') {
+    throw new HttpError(409, 'This session has been cancelled');
+  }
+
+  if (!session.is_today) {
+    throw new HttpError(403, 'Times can only be submitted on the day of the session');
+  }
+
+  const sql = getSql(env);
+  const rows = await sql`
+    UPDATE attendance
+    SET finish_time_seconds = ${seconds}
+    WHERE session_id = ${id}
+      AND member_id = ${membership.id}
+    RETURNING
+      id::text AS id,
+      finish_time_seconds
+  `;
+
+  if (!rows.length) {
+    throw new HttpError(409, 'Check in before submitting your time');
+  }
+
+  return json({ attendance: rows[0] });
 }
 
 export async function onRequestDelete(context) {

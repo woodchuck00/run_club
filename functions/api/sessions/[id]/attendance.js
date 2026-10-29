@@ -50,7 +50,12 @@ export async function onRequestPost(context) {
       const rows = await sql`
         INSERT INTO attendance (session_id, member_id, source, marked_by)
         VALUES (${id}, ${memberId}, 'admin', ${membership.user_id})
-        RETURNING id::text AS id, member_id::text AS member_id, guest_name, source
+        RETURNING
+          id::text AS id,
+          member_id::text AS member_id,
+          guest_name,
+          source,
+          finish_time_seconds
       `;
 
       return json({
@@ -74,7 +79,12 @@ export async function onRequestPost(context) {
     const rows = await sql`
       INSERT INTO attendance (session_id, guest_name, source, marked_by)
       VALUES (${id}, ${guestName}, 'admin', ${membership.user_id})
-      RETURNING id::text AS id, member_id::text AS member_id, guest_name, source
+      RETURNING
+        id::text AS id,
+        member_id::text AS member_id,
+        guest_name,
+        source,
+        finish_time_seconds
     `;
 
     return json({

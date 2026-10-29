@@ -3,6 +3,7 @@ import { getSql, pgErrorCode } from '../../_lib/db.js';
 import { requireAdmin, requireClub, requireMembership } from '../../_lib/clubs.js';
 import {
   asDate,
+  asOptionalText,
   asOptionalTitle,
   parseLimit,
 } from '../../_lib/validate.js';
@@ -20,6 +21,9 @@ export async function onRequestGet(context) {
       s.id::text AS id,
       s.session_date::text AS session_date,
       s.title,
+      s.description,
+      s.address,
+      s.distance,
       s.status,
       s.created_at,
       (s.session_date = (now() AT TIME ZONE ${club.timezone})::date) AS is_today,
@@ -41,7 +45,14 @@ export async function onRequestGet(context) {
         WHERE mine.session_id = s.id
           AND mine.member_id = ${membership.id}
         LIMIT 1
-      ) AS my_attendance_source
+      ) AS my_attendance_source,
+      (
+        SELECT mine.finish_time_seconds
+        FROM attendance mine
+        WHERE mine.session_id = s.id
+          AND mine.member_id = ${membership.id}
+        LIMIT 1
+      ) AS my_finish_time_seconds
     FROM sessions s
     LEFT JOIN attendance a ON a.session_id = s.id
     WHERE s.club_id = ${club.id}
@@ -60,18 +71,40 @@ export async function onRequestPost(context) {
   const body = await readJson(request);
   const sessionDate = asDate(body.sessionDate);
   const title = asOptionalTitle(body.title);
+  const description = asOptionalText(body.description, 500, 'Description');
+  const address = asOptionalText(body.address, 200, 'Address');
+  const distance = asOptionalText(body.distance, 60, 'Distance');
   const sql = getSql(env);
 
   let session;
 
   try {
     const rows = await sql`
-      INSERT INTO sessions (club_id, session_date, title, created_by)
-      VALUES (${club.id}, ${sessionDate}, ${title}, ${membership.user_id})
+      INSERT INTO sessions (
+        club_id,
+        session_date,
+        title,
+        description,
+        address,
+        distance,
+        created_by
+      )
+      VALUES (
+        ${club.id},
+        ${sessionDate},
+        ${title},
+        ${description},
+        ${address},
+        ${distance},
+        ${membership.user_id}
+      )
       RETURNING
         id::text AS id,
         session_date::text AS session_date,
         title,
+        description,
+        address,
+        distance,
         status,
         created_at
     `;

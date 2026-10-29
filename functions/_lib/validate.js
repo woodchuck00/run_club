@@ -216,22 +216,71 @@ export function asOptionalBirthdate(value) {
   return birthdate;
 }
 
-export function asOptionalText(value, max = 1000) {
+export function asOptionalText(value, max = 1000, field = 'Field') {
   if (value === undefined || value === null || value === '') {
     return null;
   }
 
   if (typeof value !== 'string') {
-    throw new HttpError(400, 'Field must be text');
+    throw new HttpError(400, `${field} must be text`);
   }
 
   const text = value.trim();
 
   if (text.length > max) {
-    throw new HttpError(400, `Field must be at most ${max} characters`);
+    throw new HttpError(400, `${field} must be at most ${max} characters`);
   }
 
   return text || null;
+}
+
+export function asFinishTimeSeconds(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  if (typeof value === 'number') {
+    if (!Number.isInteger(value) || value <= 0 || value >= 86400) {
+      throw new HttpError(400, 'Finish time must be a valid number of seconds');
+    }
+
+    return value;
+  }
+
+  if (typeof value !== 'string') {
+    throw new HttpError(400, 'Finish time must be text');
+  }
+
+  const parts = value.trim().split(':');
+
+  if (
+    parts.length < 2 ||
+    parts.length > 3 ||
+    parts.some((part) => !/^\d+$/.test(part))
+  ) {
+    throw new HttpError(400, 'Finish time must look like MM:SS or H:MM:SS');
+  }
+
+  const numbers = parts.map(Number);
+  const [hours, minutes, seconds] = parts.length === 3
+    ? numbers
+    : [0, numbers[0], numbers[1]];
+
+  if (minutes > 59 || seconds > 59) {
+    throw new HttpError(400, 'Finish time minutes and seconds must be below 60');
+  }
+
+  const total = (hours * 3600) + (minutes * 60) + seconds;
+
+  if (total <= 0) {
+    throw new HttpError(400, 'Finish time must be greater than zero');
+  }
+
+  if (total >= 86400) {
+    throw new HttpError(400, 'Finish time must be under 24 hours');
+  }
+
+  return total;
 }
 
 export function asOptionalJsonb(value, maxKeys = 10) {

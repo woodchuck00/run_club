@@ -11,6 +11,7 @@ export default {
       signedAvatarUrl: '',
       dropdownOpen: false,
       mobileOpen: false,
+      theme: 'light',
     };
   },
   watch: {
@@ -20,6 +21,7 @@ export default {
     },
   },
   mounted() {
+    this.theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
     this.loadAvatar();
     this.$watch('authStore.user', () => this.loadAvatar(), { deep: true, immediate: true });
     document.addEventListener('click', this.onClickOutside);
@@ -70,6 +72,16 @@ export default {
       this.dropdownOpen = !this.dropdownOpen;
       if (this.dropdownOpen) {
         this.mobileOpen = false;
+      }
+    },
+    toggleTheme() {
+      this.theme = this.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = this.theme;
+
+      try {
+        localStorage.setItem('run-club-theme', this.theme);
+      } catch {
+        // Theme still applies for this page view if storage is unavailable.
       }
     },
     toggleMobile() {
@@ -155,6 +167,20 @@ export default {
       </nav>
 
       <div class="flex items-center gap-2 sm:gap-3">
+        <button
+          type="button"
+          class="icon-button theme-toggle"
+          :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+          :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+          :aria-pressed="theme === 'dark'"
+          @click="toggleTheme"
+        >
+          <i
+            :class="theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon'"
+            aria-hidden="true"
+          />
+        </button>
+
         <div v-if="authStore.isAuthenticated" ref="avatarDropdown" class="avatar-dropdown">
           <button
             type="button"

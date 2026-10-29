@@ -4,6 +4,7 @@ import { useAuthStore } from '../stores/auth';
 import { api } from '../lib/api';
 import { formatSessionDate } from '../lib/dates';
 import { initials } from '../lib/format';
+import { formatFinishTime } from '../lib/time';
 import AlertMessage from '../components/AlertMessage.vue';
 import CheckInCard from '../components/CheckInCard.vue';
 
@@ -94,7 +95,28 @@ export default {
         this.busy = false;
       }
     },
+    async submitTime(seconds) {
+      if (!this.session || this.busy) {
+        return;
+      }
+
+      this.busy = true;
+      this.error = '';
+
+      try {
+        await api(`/sessions/${this.session.id}/checkin`, {
+          method: 'PATCH',
+          body: { seconds },
+        });
+        await this.load();
+      } catch (error) {
+        this.error = error.message;
+      } finally {
+        this.busy = false;
+      }
+    },
     initials,
+    formatFinishTime,
   },
 };
 </script>
@@ -136,6 +158,19 @@ export default {
               · {{ session.member_count }} members, {{ session.guest_count }} guests
             </span>
           </p>
+          <p v-if="session.description" class="muted session-description">
+            {{ session.description }}
+          </p>
+          <div v-if="session.address || session.distance" class="row small muted">
+            <span v-if="session.distance" class="icon-text">
+              <i class="fa-solid fa-route" aria-hidden="true" />
+              <span>{{ session.distance }}</span>
+            </span>
+            <span v-if="session.address" class="icon-text">
+              <i class="fa-solid fa-location-dot" aria-hidden="true" />
+              <span>{{ session.address }}</span>
+            </span>
+          </div>
         </div>
         <div class="row">
           <RouterLink
@@ -157,8 +192,10 @@ export default {
           :checked-in="checkedIn"
           :can-undo="canUndo"
           :busy="busy"
+          :finish-time-seconds="session.my_finish_time_seconds"
           @checkin="checkIn"
           @undo="undoCheckIn"
+          @submit-time="submitTime"
         />
 
         <AlertMessage
@@ -212,6 +249,10 @@ export default {
                     <span class="small muted">
                       {{ record.source === 'self' ? 'Self check-in' : 'Added by admin' }}
                     </span>
+                    <span v-if="record.finish_time_seconds" class="badge badge-primary">
+                      <i class="fa-solid fa-stopwatch" aria-hidden="true" />
+                      {{ formatFinishTime(record.finish_time_seconds) }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -236,3 +277,11 @@ export default {
     </div>
   </div>
 </template>
+
+<style scoped>
+.session-description {
+  max-width: 48rem;
+  margin-top: 0.4rem;
+  white-space: pre-line;
+}
+</style>

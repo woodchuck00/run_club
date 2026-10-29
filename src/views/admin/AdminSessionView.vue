@@ -2,6 +2,7 @@
 import { api } from '../../lib/api';
 import { formatSessionDate } from '../../lib/dates';
 import { initials } from '../../lib/format';
+import { formatFinishTime } from '../../lib/time';
 import AlertMessage from '../../components/AlertMessage.vue';
 
 export default {
@@ -164,6 +165,7 @@ export default {
       }
     },
     initials,
+    formatFinishTime,
   },
 };
 </script>
@@ -207,6 +209,19 @@ export default {
               · {{ session.member_count }} members, {{ session.guest_count }} guests
             </span>
           </p>
+          <p v-if="session.description" class="muted session-description">
+            {{ session.description }}
+          </p>
+          <div v-if="session.address || session.distance" class="row small muted">
+            <span v-if="session.distance" class="icon-text">
+              <i class="fa-solid fa-route" aria-hidden="true" />
+              <span>{{ session.distance }}</span>
+            </span>
+            <span v-if="session.address" class="icon-text">
+              <i class="fa-solid fa-location-dot" aria-hidden="true" />
+              <span>{{ session.address }}</span>
+            </span>
+          </div>
         </div>
         <div class="row">
           <RouterLink
@@ -264,6 +279,10 @@ export default {
                     <span v-if="record.member_status === 'archived'" class="badge">Archived</span>
                     <span class="small muted">
                       {{ record.source === 'self' ? 'Self check-in' : 'Added by admin' }}
+                    </span>
+                    <span v-if="record.finish_time_seconds" class="badge badge-primary">
+                      <i class="fa-solid fa-stopwatch" aria-hidden="true" />
+                      {{ formatFinishTime(record.finish_time_seconds) }}
                     </span>
                   </div>
                 </div>
@@ -380,3 +399,11 @@ export default {
     </div>
   </div>
 </template>
+
+<style scoped>
+.session-description {
+  max-width: 48rem;
+  margin-top: 0.4rem;
+  white-space: pre-line;
+}
+</style>

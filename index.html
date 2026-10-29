@@ -7,6 +7,16 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="description" content="Weekly attendance tracking for the run club." />
     <title>Run Club</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('run-club-theme');
+          document.documentElement.dataset.theme = stored === 'dark' ? 'dark' : 'light';
+        } catch (error) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>
